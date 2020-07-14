@@ -1,0 +1,36 @@
+$width: 604px;
+$height: 604px;
+$cell-size: 66px;
+
+.detail-content {
+    width: $width;
+    margin-bottom: 10px;
+}
+
+summary:focus {
+    outline: none;
+}
+
+details:focus {
+    outline: none;
+}
+
+.no-break {
+    display: inline-block;
+}
+
+.center-text {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.suLayout {
+  display: grid;
+  width: $width;
+  height: $height;
+  margin:4px;
+  grid-template-rows: repeat(3, $cell-size) 4px repeat(3, $cell-size) 4px repeat(3, $cell-size) ;
+  grid-template-columns: repeat(3, $cell-size) 4px repeat(3, $cell-size) 4px repeat(3, $cell-size) ;
+  border: 1px solid lightslategrey;
+  background-color: black;
+}

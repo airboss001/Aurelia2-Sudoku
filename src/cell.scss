@@ -1,0 +1,55 @@
+.cell {
+    position: relative;
+    width: 100%;
+    border: 1px solid lightslategrey;
+    background-color: whitesmoke;
+}
+
+.cell:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+
+.cell-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.cellTop {
+    padding: 2px;
+    font-size: medium;
+}
+
+.cellCenter {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: medium;
+}
+
+.cell-selected {
+    background-color: #ccffcc;
+}
+
+.cell-value {
+    font-size: 3em;
+    font-weight: bold;
+    color: black;
+}
+
+.cell-value-hint {
+    font-size: 3em;
+    font-weight: bold;
+    color: navy;
+}
+
+.cell-error {
+    color: red;
+}
+
+.cell-hints {
+}
