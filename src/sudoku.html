@@ -1,156 +1,126 @@
 <import from="./cell"></import>
-<div>
+<div class="wrapper">
     <h1 click.trigger="doEdit()">Sudoku - standard 3x3 ${editingText}</h1>
-</div>
-<details class="detail-content">
-    <summary>Instructions</summary>
-    <ul>
-        <li style="margin-bottom: 10px;">Click title to edit initial values</li>
-        <li>Use the arrow keys to move the selected cell</li>
-        <li>Use any number key to enter cell value</li>
-        <li>Use SHIFT-number to enter a Row hint</li>
-        <li>Use CTRL-number to enter a cell hint</li>
-        <li>Entering a number again will clear only that number</li>
-        <li>The ZERO(0) key is used to clear all values using the selected modifier</li>
-    </ul>
-</details>
-<div id="matrix" class="suLayout">
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[1][9]"></cell>
-
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[2][9]"></cell>
-
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[3][9]"></cell>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[4][9]"></cell>
-
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[5][9]"></cell>
-
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[6][9]"></cell>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[7][9]"></cell>
-
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[8][9]"></cell>
-
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][1]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][2]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][3]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][4]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][5]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][6]"></cell>
-    <div></div>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][7]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][8]"></cell>
-    <cell class="matrixCell" cell-model.bind="matrix.cellRowCol[9][9]"></cell>
-</div>
-
-<p>
+    <details class="detail-content">
+        <summary>Instructions</summary>
+        <ul>
+            <li style="margin-bottom: 10px;">Click title to edit initial values</li>
+            <li>Use the arrow keys to move the selected cell</li>
+            <li>Use any number key to enter cell value</li>
+            <li>Use SHIFT-number to enter a Row hint</li>
+            <li>Use CTRL-number to enter a cell hint</li>
+            <li>Entering a number again will clear only that number</li>
+            <li>The ZERO(0) key is used to clear all values using the selected modifier</li>
+        </ul>
+    </details>
+    <div id="matrix" class="matrix-layout">
+        <div class="cell1-layout">
+            <cell cell-model.bind="matrix.cellRowCol[1][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[1][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[1][3]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][3]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][3]"></cell>
+        </div>
+        <div class="cell2-layout">
+            <cell cell-model.bind="matrix.cellRowCol[1][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[1][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[1][6]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][6]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][6]"></cell>
+        </div>
+        <div class="cell3-layout">
+            <cell cell-model.bind="matrix.cellRowCol[1][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[1][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[1][9]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[2][9]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[3][9]"></cell>
+        </div>
+        <div class="cell4-layout">
+            <cell cell-model.bind="matrix.cellRowCol[4][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[4][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[4][3]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][3]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][3]"></cell>
+        </div>
+        <div class="cell5-layout">
+            <cell cell-model.bind="matrix.cellRowCol[4][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[4][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[4][6]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][6]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][6]"></cell>
+        </div>
+        <div class="cell6-layout">
+            <cell cell-model.bind="matrix.cellRowCol[4][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[4][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[4][9]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[5][9]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[6][9]"></cell>
+        </div>
+        <div class="cell7-layout">
+            <cell cell-model.bind="matrix.cellRowCol[7][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[7][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[7][3]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][3]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][1]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][2]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][3]"></cell>
+        </div>
+        <div class="cell6-layout">
+            <cell cell-model.bind="matrix.cellRowCol[7][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[7][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[7][6]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][6]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][4]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][5]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][6]"></cell>
+        </div>
+        <div class="cell9-layout">
+            <cell cell-model.bind="matrix.cellRowCol[7][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[7][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[7][9]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[8][9]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][7]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][8]"></cell>
+            <cell cell-model.bind="matrix.cellRowCol[9][9]"></cell>
+        </div>
+    </div>
+    <p>
     <p>
         <button click.trigger="loadSampleData()">Load Sample Puzzle</button>
     </p>
     <p>
-        <h4>Note: if browser data cleared puzzle save is lost.</h4>
-        <button click.trigger="saveData()">Save Current Puzzle</button>
-        <button click.trigger="loadSaveData()">Load Saved Puzzle</button>
+    <h4>Note: if browser data cleared puzzle save is lost.</h4>
+    <button click.trigger="saveData()">Save Current Puzzle</button>
+    <button click.trigger="loadSaveData()">Load Saved Puzzle</button>
     </p>
-</p>
+    </p>
