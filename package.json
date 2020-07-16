@@ -8,6 +8,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "alerty": "0.0.1",
     "aurelia": "dev",
     "ts-key-enum": "^2.0.3"
   },

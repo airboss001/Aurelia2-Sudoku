@@ -1,4 +1,5 @@
 import { CellModel } from "./cell-model";
+import * as alerty from "alerty/dist/js/alerty.js";
 
 export const cellRowMax: number = 9;
 export const cellColMax: number = 9;
@@ -10,6 +11,8 @@ export class SudokuMatrix
     rowValArray: CellModel[][] = [];
     colValArray: CellModel[][] = [];
     cellValArray: CellModel[][] = [];
+
+    private readonly lsSaveName = "AU2.Sudoku.save";
 
     constructor()
     {
@@ -83,6 +86,7 @@ export class SudokuMatrix
 ---61---3`;
 
         this.loadStringData(data);
+        alerty.toasts("Sample Loaded...");
     }
 
     loadStringData(data: string): void
@@ -122,24 +126,37 @@ export class SudokuMatrix
         }
     }
 
-    saveMatrixToLocalstorage(): void
+    allowSaveOverwrite()
     {
-        let json = localStorage.getItem("AU2.Sudoku.save");
-        if (json)
+        let json = localStorage.getItem(this.lsSaveName);
+        if (json !== null)
         {
             if (!confirm("This will overwrite your current save data, are you sure?"))
-                return;
+                return false;
         }
 
+        return true;
+    }
+    saveMatrixToLocalstorage(): void
+    {
+        this.allowSaveOverwrite();
+
+        let json = localStorage.getItem(this.lsSaveName);
+
         json = JSON.stringify(this.cellRowCol);
-        localStorage.setItem("AU2.Sudoku.save", json);
+        localStorage.setItem(this.lsSaveName, json);
+        alerty.toasts("Saved");
     }
 
     loadLocalstorageToMatrix(): void
     {
-        let json = localStorage.getItem("AU2.Sudoku.save");
+        let json = localStorage.getItem(this.lsSaveName);
 
-        if (!json) return;
+        if (!json)
+        {
+            alerty.toasts("There is no save to load.");
+            return;
+        }
 
         let matrix: CellModel[][] = JSON.parse(json);
         console.log("load matrix", matrix);
@@ -159,6 +176,7 @@ export class SudokuMatrix
                 model.rowHints = smodel.rowHints;
             }
         }
+        alerty.toasts("Load complete");
     }
 
     createMatrix(): CellModel[][]

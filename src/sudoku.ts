@@ -13,6 +13,7 @@ export class Sudoku
     eventListener: void;
     myKeypressCallback: (e: any) => void = null;
     isEdit: boolean = false;
+    isDirty: boolean = false;
 
     constructor(private matrix: SudokuMatrix)
     {
@@ -48,7 +49,7 @@ export class Sudoku
     removeSubscribers(): void
     {
         if (!this.myKeypressCallback) return;
-        
+
         document.removeEventListener('keydown', this.myKeypressCallback);
         this.myKeypressCallback = null;
     }
@@ -198,6 +199,8 @@ export class Sudoku
                     }
                     break;
             }
+
+            this.isDirty = true;
             this.matrix.doMatrixValidation();
         }
     }
@@ -263,9 +266,25 @@ export class Sudoku
         //     "->", this.currRow, this.currCol);
     }
 
+    allowOverwrite(): boolean
+    {
+        if (this.isDirty)
+        {
+            if (!confirm("This will overwrite any changes. Are you sure?")) 
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     loadSampleData(): void
     {
+        if(!this.allowOverwrite()) return;
+        
         this.matrix.loadSampleData();
+        this.isDirty = false;
     }
 
     saveData(): void
@@ -275,6 +294,9 @@ export class Sudoku
 
     loadSaveData(): void
     {
+        if (!this.allowOverwrite()) return;
+
         this.matrix.loadLocalstorageToMatrix();
+        this.isDirty = true;
     }
 }
