@@ -225,11 +225,18 @@ export class SudokuMatrix
             this.rowValArray[ iCol ] = colArr;
         }
 
+        //cell layout
+        //1 | 2 | 3
+        //- - - - -
+        //4 | 5 | 6
+        //- - - - -
+        //7 | 8 | 9
         //cells
         let cellArr1 = [];
         let cellArr2 = [];
         let cellArr3 = [];
 
+        //Cell 1
         cellArr1[ 1 ] = this.cellRowCol[ 1 ][ 1 ];
         cellArr1[ 2 ] = this.cellRowCol[ 1 ][ 2 ];
         cellArr1[ 3 ] = this.cellRowCol[ 1 ][ 3 ];
@@ -240,6 +247,7 @@ export class SudokuMatrix
         cellArr3[ 2 ] = this.cellRowCol[ 1 ][ 8 ];
         cellArr3[ 3 ] = this.cellRowCol[ 1 ][ 9 ];
 
+        //Cell 2
         cellArr1[ 4 ] = this.cellRowCol[ 2 ][ 1 ];
         cellArr1[ 5 ] = this.cellRowCol[ 2 ][ 2 ];
         cellArr1[ 6 ] = this.cellRowCol[ 2 ][ 3 ];
@@ -250,6 +258,7 @@ export class SudokuMatrix
         cellArr3[ 5 ] = this.cellRowCol[ 2 ][ 8 ];
         cellArr3[ 6 ] = this.cellRowCol[ 2 ][ 9 ];
 
+        //Cell 3
         cellArr1[ 7 ] = this.cellRowCol[ 3 ][ 1 ];
         cellArr1[ 8 ] = this.cellRowCol[ 3 ][ 2 ];
         cellArr1[ 9 ] = this.cellRowCol[ 3 ][ 3 ];
@@ -268,6 +277,7 @@ export class SudokuMatrix
         cellArr2 = [];
         cellArr3 = [];
 
+        //Cell 4
         cellArr1[ 1 ] = this.cellRowCol[ 4 ][ 1 ];
         cellArr1[ 2 ] = this.cellRowCol[ 4 ][ 2 ];
         cellArr1[ 3 ] = this.cellRowCol[ 4 ][ 3 ];
@@ -278,6 +288,7 @@ export class SudokuMatrix
         cellArr3[ 2 ] = this.cellRowCol[ 4 ][ 8 ];
         cellArr3[ 3 ] = this.cellRowCol[ 4 ][ 9 ];
 
+        //Cell 5
         cellArr1[ 4 ] = this.cellRowCol[ 5 ][ 1 ];
         cellArr1[ 5 ] = this.cellRowCol[ 5 ][ 2 ];
         cellArr1[ 6 ] = this.cellRowCol[ 5 ][ 3 ];
@@ -288,6 +299,7 @@ export class SudokuMatrix
         cellArr3[ 5 ] = this.cellRowCol[ 5 ][ 8 ];
         cellArr3[ 6 ] = this.cellRowCol[ 5 ][ 9 ];
 
+        //Cell 6
         cellArr1[ 7 ] = this.cellRowCol[ 6 ][ 1 ];
         cellArr1[ 8 ] = this.cellRowCol[ 6 ][ 2 ];
         cellArr1[ 9 ] = this.cellRowCol[ 6 ][ 3 ];
@@ -306,6 +318,7 @@ export class SudokuMatrix
         cellArr2 = [];
         cellArr3 = [];
 
+        //Cell 7
         cellArr1[ 1 ] = this.cellRowCol[ 7 ][ 1 ];
         cellArr1[ 2 ] = this.cellRowCol[ 7 ][ 2 ];
         cellArr1[ 3 ] = this.cellRowCol[ 7 ][ 3 ];
@@ -316,6 +329,7 @@ export class SudokuMatrix
         cellArr3[ 2 ] = this.cellRowCol[ 7 ][ 8 ];
         cellArr3[ 3 ] = this.cellRowCol[ 7 ][ 9 ];
 
+        //Cell 8
         cellArr1[ 4 ] = this.cellRowCol[ 8 ][ 1 ];
         cellArr1[ 5 ] = this.cellRowCol[ 8 ][ 2 ];
         cellArr1[ 6 ] = this.cellRowCol[ 8 ][ 3 ];
@@ -326,6 +340,7 @@ export class SudokuMatrix
         cellArr3[ 5 ] = this.cellRowCol[ 8 ][ 8 ];
         cellArr3[ 6 ] = this.cellRowCol[ 8 ][ 9 ];
 
+        //Cell 9
         cellArr1[ 7 ] = this.cellRowCol[ 9 ][ 1 ];
         cellArr1[ 8 ] = this.cellRowCol[ 9 ][ 2 ];
         cellArr1[ 9 ] = this.cellRowCol[ 9 ][ 3 ];

@@ -15,18 +15,19 @@
     </details>
     <div id="matrix" class="matrix-layout">
         <template repeat.for="row of matrix.cellRowCol">
-            <template repeat.for="col of row" if.bind="$parent.index !== 0 && $index !== 0">                
-                <cell class="cell-${$parent.$index}${$index}" cell-model.bind="col"></cell>        
+            <template repeat.for="col of row" if.bind="$parent.index !== 0 && $index !== 0">
+                <cell class="cell-${$parent.$index}${$index}" cell-model.bind="col"></cell>
             </template>
         </template>
     </div>
     <p>
-    <p>
-        <button click.trigger="loadSampleData()">Load Sample Puzzle</button>
+        <p>
+            <button click.trigger="loadSampleData()">Load Sample Puzzle</button>
+        </p>
+        <p>
+            <h4>Note: if browser data cleared puzzle save is lost.</h4>
+            <button click.trigger="saveData()">Save Current Puzzle</button>
+            <button click.trigger="loadSaveData()">Load Saved Puzzle</button>
+        </p>
     </p>
-    <p>
-    <h4>Note: if browser data cleared puzzle save is lost.</h4>
-    <button click.trigger="saveData()">Save Current Puzzle</button>
-    <button click.trigger="loadSaveData()">Load Saved Puzzle</button>
-    </p>
-    </p>
+</div>
