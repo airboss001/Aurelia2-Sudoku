@@ -1,3 +1,5 @@
+import { blockSize, blockLoopMax, cellRowSize, cellColSize, cellsInBlock, sudokuLoopSize, sudokuSize } from "./constants";
+
 //Code from: https://www.emanueleferonato.com/2015/06/23/pure-javascript-sudoku-generatorsolver/
 export class SudokuGenerator
 {
@@ -8,34 +10,34 @@ export class SudokuGenerator
     // ... and we solve it!!
     generate()
     {
-        this.sudoku = new Array(81).fill(0);
+        this.sudoku = new Array(sudokuSize).fill(0);
         this.solve(this.sudoku);
     }
 
     // given a sudoku cell, returns the row
     returnRow(cell)
     {
-        return Math.floor(cell / 9);
+        return Math.floor(cell / blockSize);
     }
 
     // given a sudoku cell, returns the column
     returnCol(cell)
     {
-        return cell % 9;
+        return cell % blockSize;
     }
 
     // given a sudoku cell, returns the 3x3 block
     returnBlock(cell)
     {
-        return Math.floor(this.returnRow(cell) / 3) * 3 + Math.floor(this.returnCol(cell) / 3);
+        return Math.floor(this.returnRow(cell) / cellRowSize) * cellRowSize + Math.floor(this.returnCol(cell) / cellColSize);
     }
 
     // given a number, a row and a sudoku, returns true if the number can be placed in the row
     isPossibleRow(number, row, sudoku)
     {
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
-            if (sudoku[ row * 9 + i ] == number)
+            if (sudoku[ row * blockSize + i ] == number)
             {
                 return false;
             }
@@ -47,9 +49,9 @@ export class SudokuGenerator
     // given a number, a column and a sudoku, returns true if the number can be placed in the column
     isPossibleCol(number, col, sudoku)
     {
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
-            if (sudoku[ col + 9 * i ] == number)
+            if (sudoku[ col + blockSize * i ] == number)
             {
                 return false;
             }
@@ -61,7 +63,7 @@ export class SudokuGenerator
     // given a number, a 3x3 block and a sudoku, returns true if the number can be placed in the block
     isPossibleBlock(number, block, sudoku)
     {
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
             let offset = this.getOffsets(block, i);
             if (sudoku[ offset.col + offset.row ] == number)
@@ -88,9 +90,9 @@ export class SudokuGenerator
     {
         let rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
         let rowTemp = new Array();
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
-            rowTemp[ i ] = sudoku[ row * 9 + i ];
+            rowTemp[ i ] = sudoku[ row * blockSize + i ];
         }
         rowTemp.sort();
         return rowTemp.join() == rightSequence.join();
@@ -101,9 +103,9 @@ export class SudokuGenerator
     {
         let rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
         let colTemp = new Array();
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
-            colTemp[ i ] = sudoku[ col + i * 9 ];
+            colTemp[ i ] = sudoku[ col + i * blockSize ];
         }
         colTemp.sort();
         return colTemp.join() == rightSequence.join();
@@ -111,8 +113,8 @@ export class SudokuGenerator
 
     getOffsets(block, i)
     {
-        let colOffset = Math.floor(block / 3) * 27 + i % 3;
-        let rowOffset = 9 * Math.floor(i / 3) + 3 * (block % 3);
+        let colOffset = Math.floor(block / cellColSize) * cellsInBlock + i % cellColSize;
+        let rowOffset = blockSize * Math.floor(i / cellRowSize) + cellRowSize * (block % cellRowSize);
         return {col: colOffset, row: rowOffset};
     }
 
@@ -121,7 +123,7 @@ export class SudokuGenerator
     {
         let rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
         let blockTemp = new Array();
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
             let offset = this.getOffsets(block, i);
             blockTemp[ i ] = sudoku[ offset.col + offset.row ];
@@ -133,7 +135,7 @@ export class SudokuGenerator
     // given a sudoku, returns true if the sudoku is solved
     isSolvedSudoku(sudoku)
     {
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
             if (!this.isCorrectBlock(i, sudoku) || !this.isCorrectRow(i, sudoku) || !this.isCorrectCol(i, sudoku))
             {
@@ -147,7 +149,7 @@ export class SudokuGenerator
     determinePossibleValues(cell, sudoku)
     {
         let possible = new Array();
-        for (let i = 1; i <= 9; i++)
+        for (let i = 1; i <= blockSize; i++)
         {
             if (this.isPossibleNumber(cell, i, sudoku))
             {
@@ -168,7 +170,7 @@ export class SudokuGenerator
     scanSudokuForUnique(sudoku)
     {
         let possible = new Array();
-        for (let i = 0; i <= 80; i++)
+        for (let i = 0; i <= sudokuLoopSize; i++)
         {
             if (sudoku[ i ] == 0)
             {
@@ -202,7 +204,7 @@ export class SudokuGenerator
     {
         let max = 9;
         let minChoices = 0;
-        for (let i = 0; i <= 80; i++)
+        for (let i = 0; i <= sudokuLoopSize; i++)
         {
             if (possible[ i ] != undefined)
             {
@@ -253,19 +255,19 @@ export class SudokuGenerator
     {
         let sudokuText = "";
         let solved = "\n\nSolved in " + i + " steps";
-        for (let i = 0; i <= 8; i++)
+        for (let i = 0; i <= blockLoopMax; i++)
         {
-            for (let j = 0; j <= 8; j++)
+            for (let j = 0; j <= blockLoopMax; j++)
             {
                 sudokuText += " ";
-                sudokuText += sudoku[ i * 9 + j ];
+                sudokuText += sudoku[ i * blockSize + j ];
                 sudokuText += " ";
-                if (j != 8)
+                if (j != blockLoopMax)
                 {
                     sudokuText += "|";
                 }
             }
-            if (i != 8)
+            if (i != blockLoopMax)
             {
                 sudokuText += "\n---+---+---+---+---+---+---+---+---\n";
             }

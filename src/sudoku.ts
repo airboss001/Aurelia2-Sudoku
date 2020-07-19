@@ -3,10 +3,8 @@ import { SudokuGenerator } from './sudoku-generator';
 //import { SudokuMatrix, cellRowMax, cellColMax } from './matrix';
 import { Key } from 'ts-key-enum';
 import * as alerty from "alerty/dist/js/alerty.js";
+import { blockSize, blockRowMax, blockColMax, blockLoopMax, sudokuLoopSize, sudokuSize } from './constants';
 
-export const cellRowMax: number = 8;
-export const cellColMax: number = 8;
-export const cellMax: number = 8;
 export class Sudoku
 {
     //current selected cell - presets
@@ -38,7 +36,7 @@ export class Sudoku
         this.currRow = 0;
         this.currCol = 0;
 
-        for (let i = 0; i < 81; i++)
+        for (let i = 0; i <= sudokuLoopSize; i++)
         {
             this.sudoku.push(new CellModel())
         }
@@ -83,8 +81,7 @@ export class Sudoku
 
     generateSudoku()
     {
-        if (!this.allowOverwrite()) return;
-
+        this.isDirty = false;
         this.clearSudoku();
 
         this.sudokuGenerator.generate();
@@ -185,7 +182,7 @@ export class Sudoku
     {
         //console.log(key, modifier);
         //let cell = this.matrix.getCellModel(this.currRow, this.currCol);
-        let cell = this.sudoku[ (9 * this.currRow) + this.currCol ];
+        let cell = this.sudoku[ (blockSize * this.currRow) + this.currCol ];
 
         if (key === "0") //clear values
         {
@@ -272,7 +269,7 @@ export class Sudoku
 
     resetErrors(): void
     {
-        for (let i = 0; i <= 80; i++)
+        for (let i = 0; i <= sudokuLoopSize; i++)
         {
             //get 3x3 data
             let cell = this.sudoku[ i ];
@@ -286,7 +283,7 @@ export class Sudoku
 
         //for each array of 9 CellModels
         //mark duplicate numbers
-        for (let j = 0; j <= cellMax; j++)
+        for (let j = 0; j <= blockLoopMax; j++)
         {
             let cell = arry[ j ];
 
@@ -308,7 +305,7 @@ export class Sudoku
             if (value > 1)
             {
                 console.log("dup found", index, value);
-                for (let i = 0; i <= 8; i++)
+                for (let i = 0; i <= blockLoopMax; i++)
                 {
                     let cell = arry[ i ];
                     if (cell.value === '' + index || cell.startValue === '' + index)
@@ -325,9 +322,9 @@ export class Sudoku
     validateCells(): void
     {
         let blockTemp = new Array();
-        for (let block = 0; block <= 8; block++)
+        for (let block = 0; block <= blockLoopMax; block++)
         {
-            for (let i = 0; i <= 8; i++)
+            for (let i = 0; i <= blockLoopMax; i++)
             {
                 let offset = this.sudokuGenerator.getOffsets(block, i);
                 blockTemp[ i ] = this.sudoku[ offset.col + offset.row ];
@@ -342,10 +339,10 @@ export class Sudoku
     validateRows(): void
     {
         let a = [];
-        for (let i = 0; i < 9; i++)
+        for (let i = 0; i < blockSize; i++)
         {
-            let st = i * 9;
-            let en = st + 9;
+            let st = i * blockSize;
+            let en = st + blockSize;
             a.push(this.sudoku.slice(st, en));
         }
 
@@ -360,10 +357,10 @@ export class Sudoku
     {
         //reverse row/cols
         let a = [];
-        for (let i = 0; i < 9; i++)
+        for (let i = 0; i < blockSize; i++)
         {
-            let st = i * 9;
-            let en = st + 9;
+            let st = i * blockSize;
+            let en = st + blockSize;
             a.push(this.sudoku.slice(st, en));
         }
         let cols = this.transpose(a);
@@ -418,18 +415,18 @@ export class Sudoku
         {
             case "ArrowUp":
                 if (this.currRow > 0) this.currRow--;
-                else this.currRow = cellRowMax;
+                else this.currRow = blockRowMax;
                 break;
             case "ArrowDown":
-                if (this.currRow < cellRowMax) this.currRow++;
+                if (this.currRow < blockRowMax) this.currRow++;
                 else this.currRow = 0;
                 break;
             case "ArrowLeft":
                 if (this.currCol > 0) this.currCol--;
-                else this.currCol = cellColMax;
+                else this.currCol = blockColMax;
                 break;
             case "ArrowRight":
-                if (this.currCol < cellColMax) this.currCol++;
+                if (this.currCol < blockColMax) this.currCol++;
                 else this.currCol = 0;
                 break;
             default:
@@ -443,40 +440,80 @@ export class Sudoku
 
     markSelectedCell(prevRow: number, prevCol: number, newRow: number, newCol: number): void
     {
-        let prevModelIndex = (9 * prevRow) + prevCol;
+        let prevModelIndex = (blockSize * prevRow) + prevCol;
         let model = this.sudoku[ prevModelIndex ];
         model.isSelected = false;
         this.sudoku.splice(prevModelIndex, 1, model);
 
-        let currModelIndex = (9 * newRow) + newCol;
+        let currModelIndex = (blockSize * newRow) + newCol;
         model = this.sudoku[ currModelIndex ];
         model.isSelected = true;
         this.sudoku.splice(currModelIndex, 1, model);
     }
 
-    allowOverwrite(): boolean
+    allowNewOverwrite(): boolean
     {
         if (this.isDirty)
         {
-            if (!confirm("This will overwrite any changes. Are you sure?")) 
-            {
-                return false;
-            }
+            alerty.confirm("This will overwrite any changes. Are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.newOk(), () => this.newCancel());
+            return;
         }
 
-        return true;
+        this.generateSudoku();
     }
+
+    newOk()
+    {
+        this.generateSudoku();
+    }
+
+    newCancel()
+    {
+        alerty.toast("Genertate New Cancelled");
+    }
+
+    allowLoadOverwrite(): boolean
+    {
+        if (this.isDirty)
+        {
+            alerty.confirm("This will overwrite any changes. Are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.loadOk(), () => this.loadCancel()); 
+                return;
+        }
+
+        this.loadSaveData();
+    }
+
+    loadOk()
+    {
+        this.loadSaveData();
+    }
+
+    loadCancel()
+    {
+        alerty.toast("Load Cancelled");
+    }
+
 
     allowSaveOverwrite()
     {
         let json = localStorage.getItem(this.lsSaveName);
         if (json !== null)
         {
-            if (!confirm("This will overwrite your current save data, are you sure?"))
-                return false;
+            alerty.confirm("This will overwrite your current save data, are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.saveOk(), () => this.saveCancel());
+                return;
         }
 
-        return true;
+        this.saveData();
+    }
+
+    saveOk()
+    {
+        this.saveData();
+    }
+
+    saveCancel()
+    {
+        alerty.toast("Save Cancelled");
     }
 
     saveData(): void
@@ -492,9 +529,6 @@ export class Sudoku
 
     loadSaveData(): void
     {
-        if (!this.allowOverwrite()) return;
-
-        //this.matrix.loadLocalstorageToMatrix();
         this.isDirty = true;
         let json = localStorage.getItem(this.lsSaveName);
 
