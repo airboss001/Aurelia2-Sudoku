@@ -1,4 +1,6 @@
 <import from="./cell"></import>
+<require from="./cell-position"></require>
+
 <div class="wrapper">
     <h1 click.trigger="doEdit()">Sudoku - standard 3x3 ${editingText}</h1>
     <details class="detail-content">
@@ -14,15 +16,13 @@
         </ul>
     </details>
     <div id="matrix" class="matrix-layout">
-        <template repeat.for="row of matrix.cellRowCol">
-            <template repeat.for="col of row" if.bind="$parent.index !== 0 && $index !== 0">
-                <cell class="cell-${$parent.$index}${$index}" cell-model.bind="col"></cell>
-            </template>
+        <template repeat.for="cell of sudoku">
+            <cell class="cell-${$index | cellPosition}" cell-model.bind="cell"></cell>
         </template>
     </div>
     <p>
         <p>
-            <button click.trigger="loadSampleData()">Load Sample Puzzle</button>
+            <button click.trigger="generateSudoku()">Generate New Puzzle</button>
         </p>
         <p>
             <h4>Note: if browser data cleared puzzle save is lost.</h4>
