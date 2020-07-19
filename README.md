@@ -2,6 +2,10 @@
 
 This project is bootstrapped by [aurelia/new](https://github.com/aurelia/new).
 
+## See Demo here
+
+[Demo Site](https://airboss001.github.io/Aurelia2-Sudoku/#/sudoku)
+
 ## Start dev web server
 
     npm start
