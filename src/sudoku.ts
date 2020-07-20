@@ -8,10 +8,8 @@ import { blockSize, blockRowMax, blockColMax, blockLoopMax, sudokuLoopSize, sudo
 export class Sudoku
 {
     //current selected cell - presets
-    prevRow: number = 0;
-    prevCol: number = 0;
-    currRow: number = 0;
-    currCol: number = 0;
+    prevPos: number = 0;
+    currPos: number = 0;
 
     public editingText = "";
     eventListener: void;
@@ -41,7 +39,8 @@ export class Sudoku
 
     afterAttach()
     {
-        this.markSelectedCell(0, 0, 0, 0);
+        //this.markSelectedCell(0, 0, 0, 0);
+        this.markSelectedCell(0, 0);
     }
 
     beforeDetach()
@@ -69,16 +68,14 @@ export class Sudoku
     {
         //Init values
         this.sudoku = [];
-        this.prevRow = 0;
-        this.prevCol = 0;
-        this.currRow = 0;
-        this.currCol = 0;
+        this.prevPos = 0;
+        this.currPos = 0;
 
         for (let i = 0; i <= sudokuLoopSize; i++)
         {
             this.sudoku.push(new CellModel())
         }
-        this.markSelectedCell(0, 0, 0, 0);
+        this.markSelectedCell(0, 0);
         this.resetSudokuErrors();
     }
 
@@ -111,7 +108,6 @@ export class Sudoku
             cell.isError = false;
         }
     }
-
 
     doEdit(): void
     {
@@ -213,7 +209,7 @@ export class Sudoku
     {
         //console.log(key, modifier);
         //let cell = this.matrix.getCellModel(this.currRow, this.currCol);
-        let cell = this.sudoku[ (blockSize * this.currRow) + this.currCol ];
+        let cell = this.sudoku[ this.currPos ];
 
         if (key === "0") //clear values
         {
@@ -330,46 +326,84 @@ export class Sudoku
 
     moveCellSelection(key): void
     {
-        this.prevRow = this.currRow;
-        this.prevCol = this.currCol;
+        this.prevPos = this.currPos;
 
         switch (key)
         {
             case "ArrowUp":
-                if (this.currRow > 0) this.currRow--;
-                else this.currRow = blockRowMax;
+                this.moveUp();
                 break;
             case "ArrowDown":
-                if (this.currRow < blockRowMax) this.currRow++;
-                else this.currRow = 0;
+                this.moveDown();
                 break;
             case "ArrowLeft":
-                if (this.currCol > 0) this.currCol--;
-                else this.currCol = blockColMax;
+                this.moveLeft();
                 break;
             case "ArrowRight":
-                if (this.currCol < blockColMax) this.currCol++;
-                else this.currCol = 0;
+                this.moveRight();
                 break;
             default:
                 return;
         }
-        this.markSelectedCell(this.prevRow, this.prevCol, this.currRow, this.currCol)
-        // console.log("select move: ", this.prevRow, this.prevCol,
-        //     "->", this.currRow, this.currCol);
     }
 
-    markSelectedCell(prevRow: number, prevCol: number, newRow: number, newCol: number): void
+    moveDown()
     {
-        let prevModelIndex = (blockSize * prevRow) + prevCol;
-        let model = this.sudoku[ prevModelIndex ];
-        model.isSelected = false;
-        this.sudoku.splice(prevModelIndex, 1, model);
+        let pos = this.currPos;
+        pos = pos + blockSize;
+        if(pos > sudokuLoopSize)
+        {
+            pos = pos - sudokuSize;
+        }
+        this.currPos = pos;
+        this.markSelectedCell(this.prevPos, this.currPos);
+    }
+    moveUp()
+    {
+        let pos = this.currPos;
+        pos = pos - blockSize;
+        if (pos < 0)
+        {
+            pos = sudokuSize + pos;
+        }
+        this.currPos = pos;
+        this.markSelectedCell(this.prevPos, this.currPos);
+    }
+    moveRight()
+    {
+        let pos = this.currPos;
+        let row = SudokuUtils.returnRow(pos);
+        let rowCol = pos % blockSize;
+        rowCol = (rowCol + 1) % blockSize;
+        this.currPos = row * blockSize + rowCol;
+        this.markSelectedCell(this.prevPos, this.currPos);
+    }
+    moveLeft()
+    {
+        let pos = this.currPos;
+        let row = SudokuUtils.returnRow(pos);
+        let rowCol = pos % blockSize;
+        if(rowCol === 0)
+        {
+            rowCol = blockSize - 1;
+        }
+        else
+        {
+            rowCol = (rowCol - 1);
+        }
+        this.currPos = row * blockSize + rowCol;
+        this.markSelectedCell(this.prevPos, this.currPos);
+    }
 
-        let currModelIndex = (blockSize * newRow) + newCol;
-        model = this.sudoku[ currModelIndex ];
+    markSelectedCell(prevPos: number, newPos: number): void
+    {
+        let model = this.sudoku[ prevPos ];
+        model.isSelected = false;
+        this.sudoku.splice(prevPos, 1, model);
+
+        model = this.sudoku[ newPos ];
         model.isSelected = true;
-        this.sudoku.splice(currModelIndex, 1, model);
+        this.sudoku.splice(newPos, 1, model);
     }
 
     allowNewOverwrite(): boolean
