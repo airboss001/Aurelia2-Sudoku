@@ -1,7 +1,15 @@
 import { blockSize, blockLoopMax, cellRowSize, cellColSize, cellsInBlock, sudokuLoopSize, sudokuSize } from "./constants";
 
+export function getOffsets(block, i)
+{
+    let colOffset = Math.floor(block / cellColSize) * cellsInBlock + i % cellColSize;
+    let rowOffset = blockSize * Math.floor(i / cellRowSize) + cellRowSize * (block % cellRowSize);
+    return { col: colOffset, row: rowOffset };
+}
+
+
 //Code from: https://www.emanueleferonato.com/2015/06/23/pure-javascript-sudoku-generatorsolver/
-export class SudokuGenerator
+export class SudokuUtils
 {
     // we start with an empty sudoku...
     // origin is by row starting at top, and working down
@@ -65,7 +73,7 @@ export class SudokuGenerator
     {
         for (let i = 0; i <= blockLoopMax; i++)
         {
-            let offset = this.getOffsets(block, i);
+            let offset = getOffsets(block, i);
             if (sudoku[ offset.col + offset.row ] == number)
             {
                 return false;
@@ -111,13 +119,6 @@ export class SudokuGenerator
         return colTemp.join() == rightSequence.join();
     }
 
-    getOffsets(block, i)
-    {
-        let colOffset = Math.floor(block / cellColSize) * cellsInBlock + i % cellColSize;
-        let rowOffset = blockSize * Math.floor(i / cellRowSize) + cellRowSize * (block % cellRowSize);
-        return {col: colOffset, row: rowOffset};
-    }
-
     // given a 3x3 block and a sudoku, returns true if it's a legal block 
     isCorrectBlock(block, sudoku)
     {
@@ -125,7 +126,7 @@ export class SudokuGenerator
         let blockTemp = new Array();
         for (let i = 0; i <= blockLoopMax; i++)
         {
-            let offset = this.getOffsets(block, i);
+            let offset = getOffsets(block, i);
             blockTemp[ i ] = sudoku[ offset.col + offset.row ];
         }
         blockTemp.sort();
