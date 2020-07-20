@@ -1,6 +1,6 @@
 import { CellModel } from "./cell-model";
 import { blockLoopMax, blockSize } from "./constants";
-import { getOffsets } from "./sudoku-utils";
+import { SudokuUtils } from "./sudoku-utils";
 
 export class Validate
 {
@@ -53,7 +53,7 @@ export class Validate
         {
             for (let i = 0; i <= blockLoopMax; i++)
             {
-                let offset = getOffsets(block, i);
+                let offset = SudokuUtils.getOffsets(block, i);
                 blockTemp[ i ] = sudoku[ offset.col + offset.row ];
             }
 
