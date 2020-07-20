@@ -16,9 +16,7 @@
         </ul>
     </details>
     <div id="matrix" class="matrix-layout">
-        <template repeat.for="cell of sudoku">
-            <cell class="cell-${$index | cellPosition}" cell-model.bind="cell"></cell>
-        </template>
+        <cell repeat.for="cell of sudoku" class="cell-${$index | cellPosition}" cell-model.bind="cell"></cell>
     </div>
     <p>
         <p>
