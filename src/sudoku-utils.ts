@@ -1,12 +1,5 @@
 import { blockSize, blockLoopMax, cellRowSize, cellColSize, cellsInBlock, sudokuLoopSize, sudokuSize } from "./constants";
 
-export function getOffsets(block, i)
-{
-    let colOffset = Math.floor(block / cellColSize) * cellsInBlock + i % cellColSize;
-    let rowOffset = blockSize * Math.floor(i / cellRowSize) + cellRowSize * (block % cellRowSize);
-    return { col: colOffset, row: rowOffset };
-}
-
 
 //Code from: https://www.emanueleferonato.com/2015/06/23/pure-javascript-sudoku-generatorsolver/
 export class SudokuUtils
@@ -22,20 +15,27 @@ export class SudokuUtils
         this.solve(this.sudoku);
     }
 
+    static getOffsets(block, i)
+    {
+        let colOffset = Math.floor(block / cellColSize) * cellsInBlock + i % cellColSize;
+        let rowOffset = blockSize * Math.floor(i / cellRowSize) + cellRowSize * (block % cellRowSize);
+        return { col: colOffset, row: rowOffset };
+    }
+
     // given a sudoku cell, returns the row
-    returnRow(cell)
+    static returnRow(cell)
     {
         return Math.floor(cell / blockSize);
     }
 
     // given a sudoku cell, returns the column
-    returnCol(cell)
+    static returnCol(cell)
     {
         return cell % blockSize;
     }
 
     // given a sudoku cell, returns the 3x3 block
-    returnBlock(cell)
+    static returnBlock(cell)
     {
         return Math.floor(this.returnRow(cell) / cellRowSize) * cellRowSize + Math.floor(this.returnCol(cell) / cellColSize);
     }
@@ -73,7 +73,7 @@ export class SudokuUtils
     {
         for (let i = 0; i <= blockLoopMax; i++)
         {
-            let offset = getOffsets(block, i);
+            let offset = SudokuUtils.getOffsets(block, i);
             if (sudoku[ offset.col + offset.row ] == number)
             {
                 return false;
@@ -86,9 +86,9 @@ export class SudokuUtils
     // given a cell, a number and a sudoku, returns true if the number can be placed in the cell
     isPossibleNumber(cell, number, sudoku)
     {
-        let row = this.returnRow(cell);
-        let col = this.returnCol(cell);
-        let block = this.returnBlock(cell);
+        let row = SudokuUtils.returnRow(cell);
+        let col = SudokuUtils.returnCol(cell);
+        let block = SudokuUtils.returnBlock(cell);
 
         return this.isPossibleRow(number, row, sudoku) && this.isPossibleCol(number, col, sudoku) && this.isPossibleBlock(number, block, sudoku);
     }
@@ -126,7 +126,7 @@ export class SudokuUtils
         let blockTemp = new Array();
         for (let i = 0; i <= blockLoopMax; i++)
         {
-            let offset = getOffsets(block, i);
+            let offset = SudokuUtils.getOffsets(block, i);
             blockTemp[ i ] = sudoku[ offset.col + offset.row ];
         }
         blockTemp.sort();
