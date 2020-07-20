@@ -1,6 +1,6 @@
+import { Validate } from './validate';
 import { CellModel } from './cell-model';
-import { SudokuGenerator } from './sudoku-generator';
-//import { SudokuMatrix, cellRowMax, cellColMax } from './matrix';
+import { SudokuUtils } from './sudoku-utils';
 import { Key } from 'ts-key-enum';
 import * as alerty from "alerty/dist/js/alerty.js";
 import { blockSize, blockRowMax, blockColMax, blockLoopMax, sudokuLoopSize, sudokuSize } from './constants';
@@ -22,28 +22,11 @@ export class Sudoku
 
     private readonly lsSaveName = "AU2.Sudoku.save";
 
-    constructor(private sudokuGenerator: SudokuGenerator)
+    constructor(private sudokuUtils: SudokuUtils, private validate: Validate)
     {
         this.clearSudoku();
     }
 
-    clearSudoku()
-    {
-        //Init values
-        this.sudoku = [];
-        this.prevRow = 0;
-        this.prevCol = 0;
-        this.currRow = 0;
-        this.currCol = 0;
-
-        for (let i = 0; i <= sudokuLoopSize; i++)
-        {
-            this.sudoku.push(new CellModel())
-        }
-        this.markSelectedCell(0, 0, 0, 0);
-        this.resetErrors();
-    }
-    
     beforeAttach()
     {
         //only set once
@@ -66,6 +49,9 @@ export class Sudoku
         this.removeSubscribers();
     }
 
+    //
+    // keyboard capture
+    //
     setSubscribers(): void
     {
         document.addEventListener('keydown', this.myKeypressCallback, { capture: true });
@@ -79,13 +65,30 @@ export class Sudoku
         this.myKeypressCallback = null;
     }
 
+    clearSudoku()
+    {
+        //Init values
+        this.sudoku = [];
+        this.prevRow = 0;
+        this.prevCol = 0;
+        this.currRow = 0;
+        this.currCol = 0;
+
+        for (let i = 0; i <= sudokuLoopSize; i++)
+        {
+            this.sudoku.push(new CellModel())
+        }
+        this.markSelectedCell(0, 0, 0, 0);
+        this.resetSudokuErrors();
+    }
+
     generateSudoku()
     {
         this.isDirty = false;
         this.clearSudoku();
 
-        this.sudokuGenerator.generate();
-        this.sudokuGenerator.sudoku.forEach((v, i) =>
+        this.sudokuUtils.generate();
+        this.sudokuUtils.sudoku.forEach((v, i) =>
         {
             console.log(v, i);
             if (Math.random() > .5)
@@ -98,6 +101,17 @@ export class Sudoku
             }
         });
     }
+
+    resetSudokuErrors(): void
+    {
+        for (let i = 0; i <= sudokuLoopSize; i++)
+        {
+            //get 3x3 data
+            let cell = this.sudoku[ i ];
+            cell.isError = false;
+        }
+    }
+
 
     doEdit(): void
     {
@@ -117,9 +131,17 @@ export class Sudoku
     {
         //console.log("handleKey", event);
         let modifier = 0;
+        let wasHandled = false;
+
         modifier = event.altKey ? 1 : modifier;
         modifier = event.shiftKey ? 2 : modifier;
         modifier = event.ctrlKey ? 3 : modifier;
+
+        //ignore if key is a modifier
+        if(event.key === "Shift" || event.key === "Control" || event.key === "Alt") 
+        {
+            return;
+        }
 
         if (!"0123456789".includes(event.key))
         {
@@ -130,6 +152,7 @@ export class Sudoku
                 case Key.ArrowLeft:
                 case Key.ArrowRight:
                     this.moveCellSelection(event.key);
+                    wasHandled = true;
                     break;
                 case "Digit0":
                 case "Digit1":
@@ -142,6 +165,7 @@ export class Sudoku
                 case "Digit8":
                 case "Digit9":
                     this.cellInputKey(event.code.substring(event.code.length - 1, event.code.length), modifier);
+                    wasHandled = true;
                     break;
                 case "Numpad0":
                 case "Numpad1":
@@ -154,6 +178,7 @@ export class Sudoku
                 case "Numpad8":
                 case "Numpad9":
                     this.cellInputKey(event.code.substring(event.code.length - 1, event.code.length), modifier);
+                    wasHandled = true;
                     break;
             }
         }
@@ -172,10 +197,16 @@ export class Sudoku
                 case "8":
                 case "9":
                     this.cellInputKey(event.key, modifier);
+                    wasHandled = true;
                     break;
             }
         }
-        event.preventDefault();
+
+        // pass through to browser if not handled instead of eating all keys
+        if(wasHandled)
+        {
+            event.preventDefault();
+        }
     }
 
     cellInputKey(key, modifier): void
@@ -247,17 +278,18 @@ export class Sudoku
             }
 
             this.isDirty = true;
-            this.resetErrors();
-            this.validateRows();
-            this.validateCols();
-            this.validateCells();
+            this.resetSudokuErrors();
+            this.validate.validateRows(this.sudoku);
+            this.validate.validateCols(this.sudoku);
+            this.validate.validateCells(this.sudoku);
 
             let checkSolved = this.sudoku.map((e) => {
                 let v = e.value;
                 let s = e.startValue;
                 return e.value !== "" ? +e.value : +e.startValue;
             });
-            if (this.sudokuGenerator.isSolvedSudoku(checkSolved))
+
+            if (this.sudokuUtils.isSolvedSudoku(checkSolved))
             {
                 alerty.alert("<h1>Congratulations!</h1>", {
                     title: 'Success',
@@ -265,116 +297,6 @@ export class Sudoku
                 });
             }
         }
-    }
-
-    resetErrors(): void
-    {
-        for (let i = 0; i <= sudokuLoopSize; i++)
-        {
-            //get 3x3 data
-            let cell = this.sudoku[ i ];
-            cell.isError = false;
-        }
-    }
-
-    validate(arry: CellModel[])
-    {
-        let checkArr = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-
-        //for each array of 9 CellModels
-        //mark duplicate numbers
-        for (let j = 0; j <= blockLoopMax; j++)
-        {
-            let cell = arry[ j ];
-
-            if (cell.value !== "")
-            {
-                checkArr[ +cell.value ]++;
-            }
-
-            if (cell.startValue !== "")
-            {
-                checkArr[ +cell.startValue ]++;
-            }
-        }
-
-        checkArr.forEach((value, index) =>
-        {
-            if (index === 0) return; //ignore 0 value, only 1-9
-
-            if (value > 1)
-            {
-                console.log("dup found", index, value);
-                for (let i = 0; i <= blockLoopMax; i++)
-                {
-                    let cell = arry[ i ];
-                    if (cell.value === '' + index || cell.startValue === '' + index)
-                    {
-                        cell.isError = true;
-                    }
-                }
-            }
-        });
-
-        checkArr = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-    }
-
-    validateCells(): void
-    {
-        let blockTemp = new Array();
-        for (let block = 0; block <= blockLoopMax; block++)
-        {
-            for (let i = 0; i <= blockLoopMax; i++)
-            {
-                let offset = this.sudokuGenerator.getOffsets(block, i);
-                blockTemp[ i ] = this.sudoku[ offset.col + offset.row ];
-            }
-
-            this.validate(blockTemp);
-        }
-
-        //this.validate(this.cellValArray);
-    }
-
-    validateRows(): void
-    {
-        let a = [];
-        for (let i = 0; i < blockSize; i++)
-        {
-            let st = i * blockSize;
-            let en = st + blockSize;
-            a.push(this.sudoku.slice(st, en));
-        }
-
-        a.forEach((arry, idx) =>
-        {
-            console.log("Row: ", idx);
-            this.validate(arry);
-        });
-    }
-
-    validateCols(): void
-    {
-        //reverse row/cols
-        let a = [];
-        for (let i = 0; i < blockSize; i++)
-        {
-            let st = i * blockSize;
-            let en = st + blockSize;
-            a.push(this.sudoku.slice(st, en));
-        }
-        let cols = this.transpose(a);
-
-        cols.forEach((arry, idx) =>
-        {
-            console.log("Col: ", idx);
-            this.validate(arry);
-        });
-    }
-
-    transpose(matrix)
-    {
-        return matrix[ 0 ].map((col, i) => matrix.map(row => row[ i ]));
     }
 
     addRemoveKey(oldHints: string, key: string): string
@@ -432,7 +354,6 @@ export class Sudoku
             default:
                 return;
         }
-        //this.matrix.markSelectedCell(this.prevRow, this.prevCol, this.currRow, this.currCol);
         this.markSelectedCell(this.prevRow, this.prevCol, this.currRow, this.currCol)
         // console.log("select move: ", this.prevRow, this.prevCol,
         //     "->", this.currRow, this.currCol);
