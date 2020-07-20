@@ -5,6 +5,14 @@
     <meta charset="utf-8">
     <title>Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script>
+        window.onbeforeunload = function ()
+        {
+            //The message is ignored by most browsers, just a confirm close is shown
+            return "You might lose your progress Are you sure?";
+        };
+    </script>
 </head>
 
 <body>
