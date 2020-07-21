@@ -11,7 +11,10 @@ export class Sudoku
     prevPos: number = 0;
     currPos: number = 0;
 
-    public editingText = "";
+    isRowHint: boolean = false;
+    isCellHint: boolean = false;
+
+    editingText = "";
     eventListener: void;
     myKeypressCallback: (e: any) => void = null;
     isEdit: boolean = false;
@@ -87,7 +90,7 @@ export class Sudoku
         this.sudokuUtils.generate();
         this.sudokuUtils.sudoku.forEach((v, i) =>
         {
-            console.log(v, i);
+            //console.log(v, i);
             if (Math.random() > .5)
             {
                 this.sudoku[ i ].startValue = '' + v;
@@ -123,6 +126,50 @@ export class Sudoku
         }
     }
 
+    cellClicked(event: MouseEvent)
+    {
+        let el: any = event.currentTarget;
+        let cell = el.dataset.cell;
+        this.prevPos = this.currPos;
+        this.currPos = cell;
+        this.markSelectedCell(this.prevPos, this.currPos);
+    }
+
+    //had to change from delegate and data-* to trigger for ios
+    //keypadClick(event)
+    keypadClick(key)
+    {
+        //let el: any = event.currentTarget
+        //let btn = el.activeElement;
+        //let key = btn.dataset.key;
+        switch (key)
+        {
+            case "0":
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+            case "9":
+                let ev = { altKey: false, shiftKey: this.isRowHint, ctrlKey: this.isCellHint, key: key, preventDefault: () => {} };
+                this.handleKey(ev);
+                break;
+            case "r":
+                this.isRowHint = !this.isRowHint;
+                if(this.isRowHint) this.isCellHint = false;
+                break;
+            case "c":
+                this.isCellHint = !this.isCellHint;
+                if (this.isCellHint) this.isRowHint = false;
+                break;
+            default:
+                break;
+        }
+    }
+
     handleKey(event)
     {
         //console.log("handleKey", event);
@@ -134,7 +181,7 @@ export class Sudoku
         modifier = event.ctrlKey ? 3 : modifier;
 
         //ignore if key is a modifier
-        if(event.key === "Shift" || event.key === "Control" || event.key === "Alt") 
+        if (event.key === "Shift" || event.key === "Control" || event.key === "Alt") 
         {
             return;
         }
@@ -199,7 +246,7 @@ export class Sudoku
         }
 
         // pass through to browser if not handled instead of eating all keys
-        if(wasHandled)
+        if (wasHandled)
         {
             event.preventDefault();
         }
@@ -279,7 +326,8 @@ export class Sudoku
             this.validate.validateCols(this.sudoku);
             this.validate.validateCells(this.sudoku);
 
-            let checkSolved = this.sudoku.map((e) => {
+            let checkSolved = this.sudoku.map((e) =>
+            {
                 let v = e.value;
                 let s = e.startValue;
                 return e.value !== "" ? +e.value : +e.startValue;
@@ -351,7 +399,7 @@ export class Sudoku
     {
         let pos = this.currPos;
         pos = pos + blockSize;
-        if(pos > sudokuLoopSize)
+        if (pos > sudokuLoopSize)
         {
             pos = pos - sudokuSize;
         }
@@ -383,7 +431,7 @@ export class Sudoku
         let pos = this.currPos;
         let row = SudokuUtils.returnRow(pos);
         let rowCol = pos % blockSize;
-        if(rowCol === 0)
+        if (rowCol === 0)
         {
             rowCol = blockSize - 1;
         }
@@ -431,8 +479,8 @@ export class Sudoku
     {
         if (this.isDirty)
         {
-            alerty.confirm("This will overwrite any changes. Are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.loadOk(), () => this.loadCancel()); 
-                return;
+            alerty.confirm("This will overwrite any changes. Are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.loadOk(), () => this.loadCancel());
+            return;
         }
 
         this.loadSaveData();
@@ -455,7 +503,7 @@ export class Sudoku
         if (json !== null)
         {
             alerty.confirm("This will overwrite your current save data, are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.saveOk(), () => this.saveCancel());
-                return;
+            return;
         }
 
         this.saveData();
@@ -494,7 +542,6 @@ export class Sudoku
         }
 
         let matrix: CellModel[] = JSON.parse(json);
-        console.log("load matrix", matrix);
 
         this.clearSudoku();
 
@@ -502,7 +549,7 @@ export class Sudoku
         {
             Object.setPrototypeOf(e, CellModel.prototype);
             this.sudoku.splice(idx, 1, e);
-            if(idx == 0)
+            if (idx == 0)
             {
                 e.isSelected = true;
             }

@@ -2,7 +2,7 @@
     "homepage": "http://airboss001.github.io/Aurelia2-Sudoku",
     "name": "aurelia-sudoku",
     "description": "An Aurelia 2 client application.",
-    "version": "0.1.0",
+    "version": "0.4.0",
     "repository": {
         "type": "git",
         "url": "???"
