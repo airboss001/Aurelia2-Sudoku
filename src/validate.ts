@@ -31,7 +31,6 @@ export class Validate
 
             if (value > 1)
             {
-                console.log("dup found", index, value);
                 for (let i = 0; i <= blockLoopMax; i++)
                 {
                     let cell = arry[ i ];
@@ -75,7 +74,6 @@ export class Validate
 
         a.forEach((arry, idx) =>
         {
-            console.log("Row: ", idx);
             this.validate(arry);
         });
     }
@@ -94,7 +92,6 @@ export class Validate
 
         cols.forEach((arry, idx) =>
         {
-            console.log("Col: ", idx);
             this.validate(arry);
         });
     }
