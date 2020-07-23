@@ -1,5 +1,5 @@
-$width: 503px;
-$height: 503px;
+$width: 604px;
+$height: 604px;
 
 .detail-content {
     width: $width;
@@ -14,11 +14,24 @@ details:focus {
     outline: none;
 }
 
+.btn {
+    margin: 1em;
+}
+
 .key-button {
-    margin: 5px;
-    width: 50px;
-    height: 40px;
+    margin: 10px 10px;
+    width: 60px;
+    height: 50px;
     color: navy;
+    font-size: 1.5em;
+}
+
+.key-button-clr {
+    margin: 10px 10px;
+    width: 100px;
+    height: 50px;
+    color: navy;
+    font-size: 1.5em;
 }
 
 .hint-button {
@@ -35,15 +48,25 @@ details:focus {
 .wrapper {
     width: $width;
     height: $height;
-    margin: 40px;
+    margin: 0px 20px 20px 20px;
+}
+
+@media only screen and (max-width: 600px) {
+    .wrapper {
+        width: $width;
+        height: $height;
+        margin: 0px 0px 0px 0px;
+    }
 }
 
 .matrix-layout {
+    //transform: scale('${scale}');
+    margin: 0px;
     display: grid;
-    padding: 4px;
-    gap: 2px;
-    grid-template-columns: repeat(3, 1fr) auto repeat(3, 1fr) auto repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr) auto repeat(3, 1fr) auto repeat(3, 1fr);
+    padding: 3px;
+    gap: 1px;
+    grid-template-columns: repeat(3, 1fr) 2px repeat(3, 1fr) 2px repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr) 1px repeat(3, 1fr) 1px repeat(3, 1fr);
     grid-template-areas:
         "cell11 cell12 cell13 . cell14 cell15 cell16 . cell17 cell18 cell19"
         "cell21 cell22 cell23 . cell24 cell25 cell26 . cell27 cell28 cell29"
@@ -68,4 +91,56 @@ details:focus {
     }
 }
 
+.page-grid {
+    display: grid;
+    padding: 3px;
+    gap: 1px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, auto);
+    grid-template-areas:
+        "header"
+        "options"
+        "board"
+}
 
+.header-section {
+    grid-row: 1 / 2;
+}
+
+.board-section {
+    grid-row: 3 / 4;
+}
+
+.option-section {
+    grid-row: 2 / 3;
+}
+
+@media only screen and (max-width: 600px) {
+    .page-grid {
+        display: grid;
+        padding: 20px 3px;
+        gap: 1px;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, auto);
+        grid-template-areas:
+            "board"
+            "header"
+            "options"
+    }
+
+    .board-section {
+        grid-row: 1 / 2;
+    }
+
+    .header-section {
+        grid-row: 2 / 3;
+    }
+
+    .option-section {
+        grid-row: 3 / 4;
+    }
+
+    .key-button-clr {
+        margin: 5px 5px;
+    }
+}
