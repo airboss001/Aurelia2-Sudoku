@@ -1,55 +1,81 @@
 <import from="./cell"></import>
 <require from="./cell-position"></require>
 
-<div class="wrapper">
-    <h1 click.trigger="doEdit()">Sudoku - standard 3x3 ${editingText}</h1>
-    <details class="detail-content">
-        <summary>Instructions</summary>
-        <ul>
-            <li style="margin-bottom: 10px;">Click title to edit initial values</li>
-            <li>Use the arrow keys or mouse to move the selected cell</li>
-            <li>Use any number key to enter cell value</li>
-            <li>Use SHIFT-number to enter a Row hint</li>
-            <li>Use CTRL-number to enter a cell hint</li>
-            <li>Entering a number again will clear that number</li>
-            <li>The ZERO(0) key is used to clear all values using the selected modifier</li>
-        </ul>
-    </details>
-    <div id="matrix" class="matrix-layout">
-        <cell repeat.for="cell of sudoku" class="cell-${$index | cellPosition}" cell-model.bind="cell"
-            data-cell="${$index}"
-            click.trigger="cellClicked($event)"></cell>
-    </div>
-    <p>
-        <details class="detail-content">
-            <summary>Show keypad</summary>
-            <!-- 
+<div class="wrapper page-grid">
+    <h3 class="header-section">Sudoku - standard 3x3 ${editingText}</h3>
+    <div class="board-section" style.bind="customCss">
+        <div class="matrix-layout">
+            <cell repeat.for="cell of sudoku" class="cell-${$index | cellPosition}" cell-model.bind="cell"
+                data-cell="${$index}" click.trigger="cellClicked($event)"></cell>
+        </div>
+        <!-- 
                 doesnt work on ios 
                 had to change to trigger on each button
                 <div style="cursor: pointer;" click.delegate="keypadClick($event)"> 
             -->
+        <div style="margin: 5px 120px;">
             <button class="key-button" click.trigger="keypadClick('7')" data-key="7">7</button>
             <button class="key-button" click.trigger="keypadClick('8')" data-key="8">8</button>
-            <button class="key-button" click.trigger="keypadClick('9')" data-key="9">9</button> 
-            <button class="hint-button ${isRowHint ? 'hint-active' : ''}" click.trigger="keypadClick('r')" data-key="r">Row Hint</button><br>
+            <button class="key-button" click.trigger="keypadClick('9')" data-key="9">9</button>
+            <button class="hint-button ${isRowHint ? 'hint-active' : ''}" click.trigger="keypadClick('r')"
+                data-key="r"
+                show.bind="!isEdit">
+                    Row Hint
+            </button><br>
             <button class="key-button" click.trigger="keypadClick('4')" data-key="4">4</button>
             <button class="key-button" click.trigger="keypadClick('5')" data-key="5">5</button>
-            <button class="key-button" click.trigger="keypadClick('6')" data-key="6">6</button> 
-            <button class="hint-button ${isCellHint ? 'hint-active' : ''}" click.trigger="keypadClick('c')"  data-key="c">Cell Hint</button><br>
+            <button class="key-button" click.trigger="keypadClick('6')" data-key="6">6</button>
+            <button class="hint-button ${isCellHint ? 'hint-active' : ''}" click.trigger="keypadClick('c')"
+                data-key="c"
+                show.bind="!isEdit">
+                Cell Hint
+            </button><br>
             <button class="key-button" click.trigger="keypadClick('1')" data-key="1">1</button>
             <button class="key-button" click.trigger="keypadClick('2')" data-key="2">2</button>
             <button class="key-button" click.trigger="keypadClick('3')" data-key="3">3</button><br>
-            <button class="key-button" click.trigger="keypadClick('0')" data-key="0">CLR</button>
-            <!-- </div> -->
+            <button class="key-button-clr" click.trigger="keypadClick('0')" data-key="0">CLR</button>
+        </div>
+        <!-- </div> -->
+    </div>
+    <div class="option-section">
+        <details class="detail-content">
+            <summary>
+                Actions & Instructions
+            </summary>
+            <div>
+                <form>
+                    <fieldset>
+                        <legend>Board size</legend>
+                        <p>
+                            <input type="radio" name="radSize" id="sizeSmall" model.bind=".6"
+                                checked.bind="selectedSize" />
+                            <label for="sizeSmall">small</label>
+                            <input type="radio" name="radSize" id="sizeMed" model.bind=".8"
+                                checked.bind="selectedSize" />
+                            <label for="sizeMed">medium</label>
+                            <input type="radio" name="radSize" id="sizeLarge" model.bind="1"
+                                checked.bind="selectedSize" />
+                            <label for="sizeLarge">large</label>
+                        </p>
+                    </fieldset>
+                </form>
+            </div>
+            <button class="btn" click.trigger="allowSaveOverwrite()">Save Current Puzzle</button>
+            <button class="btn" click.trigger="allowLoadOverwrite()">Load Saved Puzzle</button>
+            <br><br>
+            <button click.trigger="allowNewOverwrite()">Generate New Puzzle</button>
+            <button click.trigger="doEdit()">Edit Puzzle</button>
+            <h4>Note: if browser data cleared puzzle save is lost.</h4>
+            <ul>
+                <li>Add your own puzzle by clicking edit</li>
+                <li>Use the arrow keys or mouse to move the selected cell</li>
+                <li>Use any number key to enter cell value</li>
+                <li>Use SHIFT-number to enter a Row hint</li>
+                <li>Use CTRL-number to enter a cell hint</li>
+                <li>Entering a number again will clear that number</li>
+                <li>The ZERO(0) key is used to clear all values using the selected modifier</li>
+            </ul>
         </details>
-    </p>
-    <p>
-        <button click.trigger="allowNewOverwrite()">Generate New Puzzle</button>
-    </p>
-    <p>
-    <h4>Note: if browser data cleared puzzle save is lost.</h4>
-    <button click.trigger="allowSaveOverwrite()">Save Current Puzzle</button>
-    <button click.trigger="allowLoadOverwrite()">Load Saved Puzzle</button>
-    </p>
-    </p>
+
+    </div>
 </div>

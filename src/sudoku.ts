@@ -1,3 +1,4 @@
+import { bindable } from 'aurelia';
 import { Validate } from './validate';
 import { CellModel } from './cell-model';
 import { SudokuUtils } from './sudoku-utils';
@@ -11,6 +12,8 @@ export class Sudoku
     prevPos: number = 0;
     currPos: number = 0;
 
+    @bindable selectedSize: number = 1;
+
     isRowHint: boolean = false;
     isCellHint: boolean = false;
 
@@ -22,6 +25,7 @@ export class Sudoku
     sudoku: CellModel[] = [];
 
     private readonly lsSaveName = "AU2.Sudoku.save";
+    customCss: string;
 
     constructor(private sudokuUtils: SudokuUtils, private validate: Validate)
     {
@@ -44,6 +48,7 @@ export class Sudoku
     {
         //this.markSelectedCell(0, 0, 0, 0);
         this.markSelectedCell(0, 0);
+        this.selectedSizeChanged();
     }
 
     beforeDetach()
@@ -65,6 +70,11 @@ export class Sudoku
 
         document.removeEventListener('keydown', this.myKeypressCallback);
         this.myKeypressCallback = null;
+    }
+
+    selectedSizeChanged()
+    {
+        this.customCss = `transform: scale(${this.selectedSize});`;
     }
 
     clearSudoku()
