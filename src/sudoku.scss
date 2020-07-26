@@ -109,6 +109,8 @@ details:focus {
 
 .board-section {
     grid-row: 3 / 4;
+    height:400px;
+    width: 400px;
 }
 
 .option-section {
@@ -140,7 +142,5 @@ details:focus {
         grid-row: 3 / 4;
     }
 
-    .key-button-clr {
-        margin: 5px 5px;
-    }
+
 }

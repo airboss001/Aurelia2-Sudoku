@@ -74,7 +74,10 @@ export class Sudoku
 
     selectedSizeChanged()
     {
-        this.customCss = `transform: scale(${this.selectedSize});`;
+        let width = Math.floor(604 * this.selectedSize);
+        let height = Math.floor(604 * this.selectedSize);
+
+        this.customCss = `width: ${width}px;height: ${height}px`;
     }
 
     clearSudoku()
