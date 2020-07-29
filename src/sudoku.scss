@@ -34,6 +34,13 @@ details:focus {
     font-size: 1.5em;
 }
 
+.key-button-reveal {
+    margin: 10px 10px 10px 130px;
+    width: 80px;
+    height: 40px;
+    color: navy;
+    font-size: 1em;
+}
 .hint-button {
     margin: 5px;
     width: 80px;
@@ -56,6 +63,59 @@ details:focus {
         width: $width;
         height: $height;
         margin: 0px 0px 0px 0px;
+    }
+}
+
+.page-grid {
+    display: grid;
+    padding: 3px;
+    gap: 1px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, auto);
+    grid-template-areas:
+        "header"
+        "options"
+        "board"
+}
+
+.header-section {
+    grid-row: 1 / 2;
+}
+
+.board-section {
+    grid-row: 3 / 4;
+    //height:400px;
+    width: 400px;
+    height: fit-content;
+}
+
+.option-section {
+    grid-row: 2 / 3;
+}
+
+@media only screen and (max-width: 600px) {
+    .page-grid {
+        display: grid;
+        padding: 20px 3px;
+        gap: 1px;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, auto);
+        grid-template-areas:
+            "board"
+            "header"
+            "options"
+    }
+
+    .board-section {
+        grid-row: 1 / 2;
+    }
+
+    .header-section {
+        grid-row: 2 / 3;
+    }
+
+    .option-section {
+        grid-row: 3 / 4;
     }
 }
 
@@ -91,56 +151,4 @@ details:focus {
     }
 }
 
-.page-grid {
-    display: grid;
-    padding: 3px;
-    gap: 1px;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(3, auto);
-    grid-template-areas:
-        "header"
-        "options"
-        "board"
-}
 
-.header-section {
-    grid-row: 1 / 2;
-}
-
-.board-section {
-    grid-row: 3 / 4;
-    height:400px;
-    width: 400px;
-}
-
-.option-section {
-    grid-row: 2 / 3;
-}
-
-@media only screen and (max-width: 600px) {
-    .page-grid {
-        display: grid;
-        padding: 20px 3px;
-        gap: 1px;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, auto);
-        grid-template-areas:
-            "board"
-            "header"
-            "options"
-    }
-
-    .board-section {
-        grid-row: 1 / 2;
-    }
-
-    .header-section {
-        grid-row: 2 / 3;
-    }
-
-    .option-section {
-        grid-row: 3 / 4;
-    }
-
-
-}

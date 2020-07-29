@@ -77,7 +77,7 @@ export class Sudoku
         let width = Math.floor(604 * this.selectedSize);
         let height = Math.floor(604 * this.selectedSize);
 
-        this.customCss = `width: ${width}px;height: ${height}px`;
+        this.customCss = `width: ${width}px;height: fit-content;`;
     }
 
     clearSudoku()
@@ -178,6 +178,11 @@ export class Sudoku
                 this.isCellHint = !this.isCellHint;
                 if (this.isCellHint) this.isRowHint = false;
                 break;
+            case "s":
+                this.sudoku[ this.currPos ].value = "" + this.sudokuUtils.sudoku[ this.currPos ];
+                this.sudoku[this.currPos].showValue = "" + this.sudokuUtils.sudoku[this.currPos];
+                this.doValidation();
+                break;
             default:
                 break;
         }
@@ -273,6 +278,8 @@ export class Sudoku
 
         if (key === "0") //clear values
         {
+            //if revealed, cannot clear
+            if (cell.showValue !== "") return;
             switch (modifier)
             {
                 case 1: // alt clear
@@ -321,6 +328,8 @@ export class Sudoku
                     }
                     else
                     {
+                        //if revealed, cannot set to another value
+                        if (cell.showValue !== "") return;
                         if (cell.value === key)
                         {
                             cell.value = "";
@@ -333,26 +342,31 @@ export class Sudoku
                     break;
             }
 
-            this.isDirty = true;
-            this.resetSudokuErrors();
-            this.validate.validateRows(this.sudoku);
-            this.validate.validateCols(this.sudoku);
-            this.validate.validateCells(this.sudoku);
+            this.doValidation();
+        }
+    }
 
-            let checkSolved = this.sudoku.map((e) =>
-            {
-                let v = e.value;
-                let s = e.startValue;
-                return e.value !== "" ? +e.value : +e.startValue;
+    doValidation()
+    {
+        this.isDirty = true;
+        this.resetSudokuErrors();
+        this.validate.validateRows(this.sudoku);
+        this.validate.validateCols(this.sudoku);
+        this.validate.validateCells(this.sudoku);
+
+        let checkSolved = this.sudoku.map((e) =>
+        {
+            let v = e.value;
+            let s = e.startValue;
+            return e.value !== "" ? +e.value : +e.startValue;
+        });
+
+        if (this.sudokuUtils.isSolvedSudoku(checkSolved))
+        {
+            alerty.alert("<h1>Congratulations!</h1>", {
+                title: 'Success',
+                okLabel: 'Ok'
             });
-
-            if (this.sudokuUtils.isSolvedSudoku(checkSolved))
-            {
-                alerty.alert("<h1>Congratulations!</h1>", {
-                    title: 'Success',
-                    okLabel: 'Ok'
-                });
-            }
         }
     }
 

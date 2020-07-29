@@ -8,6 +8,7 @@ export class CellModel
     private _value: string = "";
     private _rowHints: string = "";
     private _cellHints: string = "";
+    private _showValue: string = "";
 
     set isSelected(value: boolean)
     {
@@ -34,6 +35,15 @@ export class CellModel
     get startValue(): string
     {
         return this._startValue;
+    }
+
+    set showValue(value: string)
+    {
+        this._showValue = value;
+    }
+    get showValue(): string
+    {
+        return this._showValue;
     }
 
     set value(value: string)
