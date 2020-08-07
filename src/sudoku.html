@@ -17,16 +17,14 @@
             <button class="key-button" click.trigger="keypadClick('7')" data-key="7">7</button>
             <button class="key-button" click.trigger="keypadClick('8')" data-key="8">8</button>
             <button class="key-button" click.trigger="keypadClick('9')" data-key="9">9</button>
-            <button class="hint-button ${isRowHint ? 'hint-active' : ''}" click.trigger="keypadClick('r')"
-                data-key="r"
+            <button class="hint-button ${isRowHint ? 'hint-active' : ''}" click.trigger="keypadClick('r')" data-key="r"
                 show.bind="!isEdit">
-                    Row Hint
+                Row Hint
             </button><br>
             <button class="key-button" click.trigger="keypadClick('4')" data-key="4">4</button>
             <button class="key-button" click.trigger="keypadClick('5')" data-key="5">5</button>
             <button class="key-button" click.trigger="keypadClick('6')" data-key="6">6</button>
-            <button class="hint-button ${isCellHint ? 'hint-active' : ''}" click.trigger="keypadClick('c')"
-                data-key="c"
+            <button class="hint-button ${isCellHint ? 'hint-active' : ''}" click.trigger="keypadClick('c')" data-key="c"
                 show.bind="!isEdit">
                 Cell Hint
             </button><br>
@@ -44,38 +42,66 @@
                 Actions & Instructions
             </summary>
             <div>
-                <form>
-                    <fieldset>
-                        <legend>Board size</legend>
-                        <p>
-                            <input type="radio" name="radSize" id="sizeSmall" model.bind=".6"
-                                checked.bind="selectedSize" />
-                            <label for="sizeSmall">small</label>
-                            <input type="radio" name="radSize" id="sizeMed" model.bind=".8"
-                                checked.bind="selectedSize" />
-                            <label for="sizeMed">medium</label>
-                            <input type="radio" name="radSize" id="sizeLarge" model.bind="1"
-                                checked.bind="selectedSize" />
-                            <label for="sizeLarge">large</label>
-                        </p>
-                    </fieldset>
-                </form>
+                <fieldset>
+                    <legend>Save & Load</legend>
+                    <p>
+                        <button class="btn" click.trigger="allowSaveOverwrite()" disabled.bind="!isDirty">Save Current Puzzle</button>
+                        <button class="btn" click.trigger="allowLoadOverwrite()" disabled.bind="!doesSaveExist">Load Saved Puzzle</button>
+                    </p>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Edit / Generate Puzzle</legend>
+                    <p>
+                        <button click.trigger="allowNewOverwrite()">Generate New Puzzle</button>
+                        <button click.trigger="doEdit()">Edit Puzzle</button>
+                        <br><br>
+                        <label for="rngvalue">Difficulty (.1 - .9):</label>
+                        <input type="number" name="rngvalue" id="rngvalue" min=".1" max=".9" step=".01"
+                            value.bind="rngValue" />
+                    </p>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Board size</legend>
+                    <p>
+                        <input type="radio" name="radSize" id="sizeSmall" model.bind="boardSize.small"
+                            checked.bind="selectedSize" />
+                        <label for="sizeSmall">small</label>
+                        <input type="radio" name="radSize" id="sizeMed" model.bind="boardSize.medium"
+                            checked.bind="selectedSize" />
+                        <label for="sizeMed">medium</label>
+                        <input type="radio" name="radSize" id="sizeLarge" model.bind="boardSize.large"
+                            checked.bind="selectedSize" />
+                        <label for="sizeLarge">large</label>
+                    </p>
+                </fieldset>
             </div>
-            <button class="btn" click.trigger="allowSaveOverwrite()">Save Current Puzzle</button>
-            <button class="btn" click.trigger="allowLoadOverwrite()">Load Saved Puzzle</button>
-            <br><br>
-            <button click.trigger="allowNewOverwrite()">Generate New Puzzle</button>
-            <button click.trigger="doEdit()">Edit Puzzle</button>
+            <details>
+                <summary>Information</summary>
+                <fieldset>
+                    <legend>Difficulty</legend>
+                    RNG chance for a cell to have the puzzle cell value visible.
+                    <ul>
+                        <li>Decrease the value to make the puzzle more difficult</li>
+                        <li>Increase the value to make it easier.</li>
+                    </ul>
+                </fieldset>
+
+                <fieldset>
+                    <legend>General Controls</legend>
+                    <ul>
+                        <li>Add your own puzzle by clicking Edit Puzzle</li>
+                        <li>Use the arrow keys or mouse to move the selected cell</li>
+                        <li>Use any number key to enter cell value</li>
+                        <li>Use SHIFT-number to enter a Row hint</li>
+                        <li>Use CTRL-number to enter a cell hint</li>
+                        <li>Entering a number again will clear that number</li>
+                        <li>The ZERO(0) key is used to clear all values using the selected modifier</li>
+                    </ul>
+                </fieldset>
+            </details>
             <h4>Note: if browser data cleared puzzle save is lost.</h4>
-            <ul>
-                <li>Add your own puzzle by clicking edit</li>
-                <li>Use the arrow keys or mouse to move the selected cell</li>
-                <li>Use any number key to enter cell value</li>
-                <li>Use SHIFT-number to enter a Row hint</li>
-                <li>Use CTRL-number to enter a cell hint</li>
-                <li>Entering a number again will clear that number</li>
-                <li>The ZERO(0) key is used to clear all values using the selected modifier</li>
-            </ul>
         </details>
 
     </div>

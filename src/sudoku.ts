@@ -1,18 +1,22 @@
+import { version } from './environment';
 import { bindable } from 'aurelia';
 import { Validate } from './validate';
 import { CellModel } from './cell-model';
 import { SudokuUtils } from './sudoku-utils';
 import { Key } from 'ts-key-enum';
 import * as alerty from "alerty/dist/js/alerty.js";
-import { blockSize, blockRowMax, blockColMax, blockLoopMax, sudokuLoopSize, sudokuSize } from './constants';
+import { blockSize, blockRowMax, blockColMax, blockLoopMax, sudokuLoopSize, sudokuSize, boardSize, initialWidth, initialHeight, positionTopLeft } from './constants';
 
 export class Sudoku
 {
     //current selected cell - presets
-    prevPos: number = 0;
-    currPos: number = 0;
+    prevPos: number = positionTopLeft;
+    currPos: number = positionTopLeft;
 
-    @bindable selectedSize: number = 1;
+    boardSize = boardSize; //use to make enum visible to view
+    @bindable selectedSize: number = boardSize.medium;
+
+    rngValue: number = .5;
 
     isRowHint: boolean = false;
     isCellHint: boolean = false;
@@ -22,7 +26,9 @@ export class Sudoku
     myKeypressCallback: (e: any) => void = null;
     isEdit: boolean = false;
     isDirty: boolean = false;
+    doesSaveExist: boolean = false;
     sudoku: CellModel[] = [];
+    sudokuFull: number[] = [];
 
     private readonly lsSaveName = "AU2.Sudoku.save";
     customCss: string;
@@ -33,6 +39,26 @@ export class Sudoku
     }
 
     beforeAttach()
+    {        
+        this.setEventSubscribers();
+    }
+
+    afterAttach()
+    {
+        this.checkSaveExist();
+        this.markSelectedCell(this.prevPos, this.currPos);
+        this.selectedSizeChanged();
+    }
+
+    beforeDetach()
+    {
+        this.removeEventSubscribers();
+    }
+
+    //
+    // keyboard capture
+    //
+    setEventSubscribers(): void
     {
         //only set once
         if (this.myKeypressCallback) return;
@@ -41,30 +67,10 @@ export class Sudoku
         {
             this.handleKey(e);
         };
-        this.setSubscribers();
-    }
-
-    afterAttach()
-    {
-        //this.markSelectedCell(0, 0, 0, 0);
-        this.markSelectedCell(0, 0);
-        this.selectedSizeChanged();
-    }
-
-    beforeDetach()
-    {
-        this.removeSubscribers();
-    }
-
-    //
-    // keyboard capture
-    //
-    setSubscribers(): void
-    {
         document.addEventListener('keydown', this.myKeypressCallback, { capture: true });
     }
 
-    removeSubscribers(): void
+    removeEventSubscribers(): void
     {
         if (!this.myKeypressCallback) return;
 
@@ -74,8 +80,7 @@ export class Sudoku
 
     selectedSizeChanged()
     {
-        let width = Math.floor(604 * this.selectedSize);
-        let height = Math.floor(604 * this.selectedSize);
+        let width = Math.floor(initialWidth * this.selectedSize);
 
         this.customCss = `width: ${width}px;height: fit-content;`;
     }
@@ -84,27 +89,28 @@ export class Sudoku
     {
         //Init values
         this.sudoku = [];
-        this.prevPos = 0;
-        this.currPos = 0;
+        this.prevPos = positionTopLeft;
+        this.currPos = positionTopLeft;
 
         for (let i = 0; i <= sudokuLoopSize; i++)
         {
             this.sudoku.push(new CellModel())
         }
-        this.markSelectedCell(0, 0);
+        this.markSelectedCell(this.prevPos, this.currPos);
         this.resetSudokuErrors();
     }
 
     generateSudoku()
     {
-        this.isDirty = false;
+        this.isDirty = true;
         this.clearSudoku();
 
         this.sudokuUtils.generate();
+        this.sudokuFull = this.sudokuUtils.sudoku;
         this.sudokuUtils.sudoku.forEach((v, i) =>
         {
             //console.log(v, i);
-            if (Math.random() > .5)
+            if (Math.random() <= this.rngValue)
             {
                 this.sudoku[ i ].startValue = '' + v;
             }
@@ -179,8 +185,8 @@ export class Sudoku
                 if (this.isCellHint) this.isRowHint = false;
                 break;
             case "s":
-                this.sudoku[ this.currPos ].value = "" + this.sudokuUtils.sudoku[ this.currPos ];
-                this.sudoku[this.currPos].showValue = "" + this.sudokuUtils.sudoku[this.currPos];
+                this.sudoku[ this.currPos ].value = "" + this.sudokuFull[ this.currPos ];
+                this.sudoku[this.currPos].showValue = "" + this.sudokuFull[this.currPos];
                 this.doValidation();
                 break;
             default:
@@ -433,6 +439,7 @@ export class Sudoku
         this.currPos = pos;
         this.markSelectedCell(this.prevPos, this.currPos);
     }
+
     moveUp()
     {
         let pos = this.currPos;
@@ -444,6 +451,7 @@ export class Sudoku
         this.currPos = pos;
         this.markSelectedCell(this.prevPos, this.currPos);
     }
+
     moveRight()
     {
         let pos = this.currPos;
@@ -453,6 +461,7 @@ export class Sudoku
         this.currPos = row * blockSize + rowCol;
         this.markSelectedCell(this.prevPos, this.currPos);
     }
+
     moveLeft()
     {
         let pos = this.currPos;
@@ -546,13 +555,23 @@ export class Sudoku
         alerty.toast("Save Cancelled");
     }
 
+    checkSaveExist()
+    {
+        let json = localStorage.getItem(this.lsSaveName);
+        
+        if(json === null) this.doesSaveExist = false;
+
+        let save = JSON.parse(json);
+        if (!save || save.version !== version) this.doesSaveExist = false;
+
+        this.doesSaveExist = true;
+    }
+
     saveData(): void
     {
         this.allowSaveOverwrite();
 
-        let json = localStorage.getItem(this.lsSaveName);
-
-        json = JSON.stringify(this.sudoku);
+        let json: string = JSON.stringify({ version: version, data: this.sudoku, full: this.sudokuFull});
         localStorage.setItem(this.lsSaveName, json);
         alerty.toasts("Saved");
     }
@@ -562,15 +581,21 @@ export class Sudoku
         this.isDirty = true;
         let json = localStorage.getItem(this.lsSaveName);
 
-        if (!json)
-        {
-            alerty.toasts("There is no save to load.");
-            return;
-        }
+        if (json === null) return;
 
-        let matrix: CellModel[] = JSON.parse(json);
+        let save = JSON.parse(json);
+        if (!save || save.version !== version) return;
+
+        // if (!json)
+        // {
+        //     alerty.toasts("There is no save to load.");
+        //     return;
+        // }
 
         this.clearSudoku();
+
+        this.sudokuFull = save.full;
+        let matrix: CellModel[] = save.data;        
 
         matrix.forEach((e: CellModel, idx: number) =>
         {
