@@ -35,4 +35,5 @@ node_modules
 /dist
 /.nyc_output
 /coverage
+package-lock.json
 index.html
