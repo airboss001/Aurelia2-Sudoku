@@ -6,6 +6,7 @@ import { SudokuUtils } from './sudoku-utils';
 import { Key } from 'ts-key-enum';
 import * as alerty from "alerty/dist/js/alerty.js";
 import { blockSize, blockRowMax, blockColMax, blockLoopMax, sudokuLoopSize, sudokuSize, boardSize, initialWidth, initialHeight, positionTopLeft } from './constants';
+import { Action } from './action';
 
 export class Sudoku
 {
@@ -29,6 +30,7 @@ export class Sudoku
     doesSaveExist: boolean = false;
     sudoku: CellModel[] = [];
     sudokuFull: number[] = [];
+    history: Action[] = [];
 
     private readonly lsSaveName = "AU2.Sudoku.save";
     customCss: string;
@@ -39,7 +41,7 @@ export class Sudoku
     }
 
     beforeAttach()
-    {        
+    {
         this.setEventSubscribers();
     }
 
@@ -85,6 +87,39 @@ export class Sudoku
         this.customCss = `width: ${width}px;height: fit-content;`;
     }
 
+    resetSudokuHistory()
+    {
+        this.history = [];
+    }
+
+    updateHistory(action: Action)
+    {
+        if (this.history.length !== 0) 
+        {
+            let last = this.history[ this.history.length-1 ];
+            if (last.position === action.position && last.newValue === action.newValue && last.oldValue === action.oldValue)
+                return;
+        }
+
+        this.history.push(action);
+    }
+
+    unDo()
+    {
+        if (this.history.length !== 0) 
+        {
+            let last = this.history[ this.history.length - 1 ];
+            if (last)
+            {
+                let v = last.oldValue === 0 ? "" : "" + last.oldValue;
+                this.sudoku[last.position].value = v;
+                this.history.pop();
+            }
+            
+            this.doValidation();
+        }
+    }
+
     clearSudoku()
     {
         //Init values
@@ -98,6 +133,7 @@ export class Sudoku
         }
         this.markSelectedCell(this.prevPos, this.currPos);
         this.resetSudokuErrors();
+        this.resetSudokuHistory();
     }
 
     generateSudoku()
@@ -173,12 +209,12 @@ export class Sudoku
             case "7":
             case "8":
             case "9":
-                let ev = { altKey: false, shiftKey: this.isRowHint, ctrlKey: this.isCellHint, key: key, preventDefault: () => {} };
+                let ev = { altKey: false, shiftKey: this.isRowHint, ctrlKey: this.isCellHint, key: key, preventDefault: () => { } };
                 this.handleKey(ev);
                 break;
             case "r":
                 this.isRowHint = !this.isRowHint;
-                if(this.isRowHint) this.isCellHint = false;
+                if (this.isRowHint) this.isCellHint = false;
                 break;
             case "c":
                 this.isCellHint = !this.isCellHint;
@@ -186,8 +222,12 @@ export class Sudoku
                 break;
             case "s":
                 this.sudoku[ this.currPos ].value = "" + this.sudokuFull[ this.currPos ];
-                this.sudoku[this.currPos].showValue = "" + this.sudokuFull[this.currPos];
+                this.sudoku[ this.currPos ].showValue = "" + this.sudokuFull[ this.currPos ];
                 this.doValidation();
+                break;
+            case "u":
+            case "Backspace":
+                this.unDo();
                 break;
             default:
                 break;
@@ -231,9 +271,6 @@ export class Sudoku
                 case "Digit7":
                 case "Digit8":
                 case "Digit9":
-                    this.cellInputKey(event.code.substring(event.code.length - 1, event.code.length), modifier);
-                    wasHandled = true;
-                    break;
                 case "Numpad0":
                 case "Numpad1":
                 case "Numpad2":
@@ -246,6 +283,9 @@ export class Sudoku
                 case "Numpad9":
                     this.cellInputKey(event.code.substring(event.code.length - 1, event.code.length), modifier);
                     wasHandled = true;
+                    break;
+                case "Backspace":
+                    this.unDo();
                     break;
             }
         }
@@ -303,6 +343,8 @@ export class Sudoku
                     }
                     else
                     {
+                        let a = new Action(this.currPos, +cell.value, 0);
+                        this.updateHistory(a);
                         cell.value = "";
                     }
                     break;
@@ -342,6 +384,9 @@ export class Sudoku
                         }
                         else
                         {
+                            let a = new Action(this.currPos, +cell.value, +key);
+                            this.updateHistory(a);
+
                             cell.value = key;
                         }
                     }
@@ -558,8 +603,8 @@ export class Sudoku
     checkSaveExist()
     {
         let json = localStorage.getItem(this.lsSaveName);
-        
-        if(json === null) this.doesSaveExist = false;
+
+        if (json === null) this.doesSaveExist = false;
 
         let save = JSON.parse(json);
         if (!save || save.version !== version) this.doesSaveExist = false;
@@ -569,9 +614,7 @@ export class Sudoku
 
     saveData(): void
     {
-        this.allowSaveOverwrite();
-
-        let json: string = JSON.stringify({ version: version, data: this.sudoku, full: this.sudokuFull});
+        let json: string = JSON.stringify({ version: version, data: this.sudoku, full: this.sudokuFull });
         localStorage.setItem(this.lsSaveName, json);
         alerty.toasts("Saved");
     }
@@ -584,8 +627,13 @@ export class Sudoku
         if (json === null) return;
 
         let save = JSON.parse(json);
-        if (!save || save.version !== version) return;
+        if (!save || save.version !== version) 
+        {
+            alerty.confirm("Version mismatch, unable to load the previous save.", { okLabel: 'Ok' }, () => this.saveOk(), () => this.saveCancel());
+            localStorage.setItem(this.lsSaveName, null);
 
+            return;
+        }
         // if (!json)
         // {
         //     alerty.toasts("There is no save to load.");
@@ -595,7 +643,7 @@ export class Sudoku
         this.clearSudoku();
 
         this.sudokuFull = save.full;
-        let matrix: CellModel[] = save.data;        
+        let matrix: CellModel[] = save.data;
 
         matrix.forEach((e: CellModel, idx: number) =>
         {
