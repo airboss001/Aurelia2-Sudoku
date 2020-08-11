@@ -1,4 +1,4 @@
-import { version } from './environment';
+import { saveVersion } from './environment';
 import { bindable } from 'aurelia';
 import { Validate } from './validate';
 import { CellModel } from './cell-model';
@@ -607,16 +607,21 @@ export class Sudoku
         if (json === null) this.doesSaveExist = false;
 
         let save = JSON.parse(json);
-        if (!save || save.version !== version) this.doesSaveExist = false;
+        if (!save || save.version !== saveVersion) this.doesSaveExist = false;
 
         this.doesSaveExist = true;
     }
 
     saveData(): void
     {
-        let json: string = JSON.stringify({ version: version, data: this.sudoku, full: this.sudokuFull });
+        let json: string = JSON.stringify({ version: saveVersion, data: this.sudoku, full: this.sudokuFull });
         localStorage.setItem(this.lsSaveName, json);
         alerty.toasts("Saved");
+    }
+
+    versionMismatchOk()
+    {
+        localStorage.setItem(this.lsSaveName, null);
     }
 
     loadSaveData(): void
@@ -627,11 +632,9 @@ export class Sudoku
         if (json === null) return;
 
         let save = JSON.parse(json);
-        if (!save || save.version !== version) 
+        if (!save || save.version !== saveVersion) 
         {
-            alerty.confirm("Version mismatch, unable to load the previous save.", { okLabel: 'Ok' }, () => this.saveOk(), () => this.saveCancel());
-            localStorage.setItem(this.lsSaveName, null);
-
+            alerty.alert("Version mismatch, unable to load the previous save.", { okLabel: 'Ok' }, () => this.versionMismatchOk());
             return;
         }
         // if (!json)
