@@ -17,14 +17,14 @@
             <button class="key-button" click.trigger="keypadClick('7')" data-key="7">7</button>
             <button class="key-button" click.trigger="keypadClick('8')" data-key="8">8</button>
             <button class="key-button" click.trigger="keypadClick('9')" data-key="9">9</button>
-            <button class="hint-button ${isRowHint ? 'hint-active' : ''}" click.trigger="keypadClick('r')" data-key="r"
+            <button class="hint-button ${hints.isRowHint ? 'hint-active' : ''}" click.trigger="keypadClick('r')" data-key="r"
                 show.bind="!isEdit">
                 Row Hint
             </button><br>
             <button class="key-button" click.trigger="keypadClick('4')" data-key="4">4</button>
             <button class="key-button" click.trigger="keypadClick('5')" data-key="5">5</button>
             <button class="key-button" click.trigger="keypadClick('6')" data-key="6">6</button>
-            <button class="hint-button ${isCellHint ? 'hint-active' : ''}" click.trigger="keypadClick('c')" data-key="c"
+            <button class="hint-button ${hints.isCellHint ? 'hint-active' : ''}" click.trigger="keypadClick('c')" data-key="c"
                 show.bind="!isEdit">
                 Cell Hint
             </button><br>
@@ -47,7 +47,7 @@
                     <legend>Save & Load</legend>
                     <p>
                         <button class="btn" click.trigger="allowSaveOverwrite()" disabled.bind="!isDirty">Save Current Puzzle</button>
-                        <button class="btn" click.trigger="allowLoadOverwrite()" disabled.bind="!doesSaveExist">Load Saved Puzzle</button>
+                        <button class="btn" click.trigger="allowLoadOverwrite()" disabled.bind="!saveExists">Load Saved Puzzle</button>
                     </p>
                 </fieldset>
 
@@ -55,7 +55,7 @@
                     <legend>Edit / Generate Puzzle</legend>
                     <p>
                         <button click.trigger="allowNewOverwrite()">Generate New Puzzle</button>
-                        <button click.trigger="doEdit()">Edit Puzzle</button>
+                        <button click.trigger="doEdit()">${!isEdit ? 'Edit Puzzle' : 'Stop Edit'}</button>
                         <br><br>
                         <label for="rngvalue">Difficulty (.1 - .9):</label>
                         <input type="number" name="rngvalue" id="rngvalue" min=".1" max=".9" step=".01"
