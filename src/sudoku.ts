@@ -6,15 +6,15 @@ import { LoadSaveUtils } from './load-save';
 import { bindable } from 'aurelia';
 import { Validate } from './validate';
 import { CellModel } from './cell-model';
-import { SudokuUtils } from './sudoku-utils';
+import { SudokuGen2 } from './sudoku-gen2';
 import * as alerty from "alerty/dist/js/alerty.js";
-import { sudokuLoopSize, boardSize, initialWidth, positionTopLeft } from './constants';
+import { sudokuLoopSize, boardSize, GameLevel, initialWidth, positionTopLeft } from './constants';
 import { Action } from './action';
 import { Position } from './position';
 
 export class Sudoku
 {
-    eventListener: void;
+    eventListener;
     myKeypressCallback: (e: any) => void = null;
 
     //current selected cell - presets
@@ -22,11 +22,11 @@ export class Sudoku
     hints: Hints = new Hints(false, false);
 
     boardSize = boardSize; //use to make enum visible to view
-    @bindable selectedSize: number = boardSize.medium;
+    gameLevel = GameLevel; //use to make enum visible to view
 
-    //starting difficulty setting
-    rngValue: number = .5;
-    
+    @bindable selectedSize: number = boardSize.medium;
+    @bindable selectedDiff: number = GameLevel.SIMPLE;
+
     editingText = "";
     isEdit: boolean = false;
     isDirty: boolean = false;
@@ -38,7 +38,7 @@ export class Sudoku
     customCss: string;
 
     constructor(
-        private sudokuUtils: SudokuUtils, 
+        private sudokuGen2: SudokuGen2, 
         private validate: Validate, 
         private loadSaveUtils: LoadSaveUtils, 
         private inputMove: MoveCellSelection,
@@ -65,7 +65,7 @@ export class Sudoku
     }
 
     // keyboard capture
-    setEventSubscribers(): void
+    setEventSubscribers()
     {
         if (this.myKeypressCallback) return;
 
@@ -77,7 +77,7 @@ export class Sudoku
         document.addEventListener('keydown', this.myKeypressCallback, { capture: true });
     }
 
-    removeEventSubscribers(): void
+    removeEventSubscribers()
     {
         if (!this.myKeypressCallback) return;
 
@@ -88,34 +88,49 @@ export class Sudoku
     selectedSizeChanged()
     {
         let width = Math.floor(initialWidth * this.selectedSize);
-
         this.customCss = `width: ${width}px;height: fit-content;`;
     }
 
     generateSudoku()
     {
         this.isDirty = true;
+
+        let grid: number[][] =
+            [ 
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+            ];
+
+        let ns = new SudokuGen2();
+
+        //Mutates passed in grid, returns puzzle to solve
+        let toSolve: number[][] = ns.processSudoku(grid, this.selectedDiff);
+
+        //flatten arrays
+        this.sudokuFull = [].concat(...grid);
+        let toSolve1D: number[] = [].concat(...toSolve);
+
+        //clear cells for fresh start
         this.clearSudoku();
 
-        this.sudokuUtils.generate();
-        this.sudokuFull = this.sudokuUtils.sudoku;
-        this.sudokuUtils.sudoku.forEach((v, i) =>
+        //update cell models
+        toSolve1D.forEach((v, i) =>
         {
-            //console.log(v, i);
-            if (Math.random() <= this.rngValue)
-            {
+            if(v !== 0)
                 this.sudoku[ i ].startValue = '' + v;
-            }
-            else
-            {
-                this.sudoku[ i ].startValue = '';
-            }
         });
     }
 
     clearSudoku()
     {
-        //Init values
+        // init values
         this.sudoku = [];
         this.position.prevPos = positionTopLeft;
         this.position.currPos = positionTopLeft;
@@ -124,22 +139,21 @@ export class Sudoku
         {
             this.sudoku.push(new CellModel())
         }
+
         this.inputMove.markSelectedCell(this.sudoku, this.position);
         this.resetSudokuErrors();
         this.keyInput.resetSudokuHistory();
     }
 
-    resetSudokuErrors(): void
+    resetSudokuErrors()
     {
         for (let i = 0; i <= sudokuLoopSize; i++)
         {
-            //get 3x3 data
-            let cell = this.sudoku[ i ];
-            cell.isError = false;
+            this.sudoku[ i ].isError = false;
         }
     }
 
-    doEdit(): void
+    doEdit()
     {
         if (this.isEdit)
         {
@@ -157,6 +171,7 @@ export class Sudoku
     {
         let el: any = event.currentTarget;
         let cell = el.dataset.cell;
+
         this.position.prevPos = this.position.currPos;
         this.position.currPos = cell;
         this.inputMove.markSelectedCell(this.sudoku, this.position);
@@ -173,36 +188,42 @@ export class Sudoku
     doValidation()
     {
         this.isDirty = true;
+
         this.resetSudokuErrors();
+
         this.validate.validateRows(this.sudoku);
         this.validate.validateCols(this.sudoku);
         this.validate.validateCells(this.sudoku);
 
-        let checkSolved = this.sudoku.map((e) =>
+        //map cell objects to array for comparison with stored solution
+        let checkSolved: number[] = this.sudoku.map((e) =>
         {
             let v = e.value;
             let s = e.startValue;
             return e.value !== "" ? +e.value : +e.startValue;
         });
 
-        if (this.sudokuUtils.isSolvedSudoku(checkSolved))
+        if (this.sudokuGen2.isSolvedSudoku(checkSolved))
         {
-            alerty.alert("<h1>Congratulations!</h1>", {
-                title: 'Success',
-                okLabel: 'Ok'
-            });
+            alerty.alert(
+                "<h1>Congratulations!</h1>", 
+                { title: 'Success', okLabel: 'Ok' });
         }
     }
 
-    allowNewOverwrite(): boolean
+    allowNewOverwrite()
     {
         if (this.isDirty)
         {
-            alerty.confirm("This will overwrite any changes. Are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.newOk(), () => this.newCancel());
+            alerty.confirm(
+                "This will overwrite any changes. Are you sure?", 
+                { okLabel: 'Ok', cancelLabel: 'Cancel' }, 
+                () => this.newOk(), 
+                () => this.cancelled("Generate"));
             return;
         }
 
-        this.generateSudoku();
+        this.newOk();
     }
 
     newOk()
@@ -210,16 +231,15 @@ export class Sudoku
         this.generateSudoku();
     }
 
-    newCancel()
-    {
-        alerty.toast("Genertate New Cancelled");
-    }
-
-    allowLoadOverwrite(): boolean
+    allowLoadOverwrite()
     {
         if (this.isDirty)
         {
-            alerty.confirm("This will overwrite any changes. Are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.loadOk(), () => this.loadCancel());
+            alerty.confirm(
+                "This will overwrite any changes. Are you sure?", 
+                { okLabel: 'Ok', cancelLabel: 'Cancel' }, 
+                () => this.loadOk(), 
+                () => this.cancelled("Load"));
             return;
         }
 
@@ -233,17 +253,21 @@ export class Sudoku
         this.doValidation();
     }
 
-    loadCancel()
+    cancelled(message: string)
     {
-        alerty.toast("Load Cancelled");
+        alerty.toast(`${message} Cancelled`);
     }
 
-    allowSaveOverwrite(): boolean
+    allowSaveOverwrite()
     {
-        let exists = this.loadSaveUtils.doesSaveExist();
-        if (exists)
+        if (this.loadSaveUtils.doesSaveExist())
         {
-            alerty.confirm("This will overwrite your current save data, are you sure?", { okLabel: 'Ok', cancelLabel: 'Cancel' }, () => this.saveOk(), () => this.saveCancel());
+            alerty.confirm(
+                "This will overwrite your current save data, are you sure?", 
+                { okLabel: 'Ok', cancelLabel: 'Cancel' }, 
+                () => this.saveOk(), 
+                () => this.cancelled("Save"));
+
             return;
         }
 
@@ -253,10 +277,5 @@ export class Sudoku
     saveOk()
     {
         this.loadSaveUtils.saveData(this.sudoku, this.sudokuFull);
-    }
-
-    saveCancel()
-    {
-        alerty.toast("Save Cancelled");
     }
 }

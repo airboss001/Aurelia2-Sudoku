@@ -35,7 +35,6 @@
             <button class="key-button-reveal" click.trigger="keypadClick('s')" data-key="s">Reveal</button>
             <button class="hint-button" click.trigger="keypadClick('u')">Undo</button>
         </div>
-        <!-- </div> -->
     </div>
     <div class="option-section">
         <details class="detail-content">
@@ -57,9 +56,14 @@
                         <button click.trigger="allowNewOverwrite()">Generate New Puzzle</button>
                         <button click.trigger="doEdit()">${!isEdit ? 'Edit Puzzle' : 'Stop Edit'}</button>
                         <br><br>
-                        <label for="rngvalue">Difficulty (.1 - .9):</label>
-                        <input type="number" name="rngvalue" id="rngvalue" min=".1" max=".9" step=".01"
-                            value.bind="rngValue" />
+                    <label>Difficulty:</label>
+                    <p>
+                        <input type="radio" name="radDiff" id="sizeSmall" model.bind="gameLevel.SIMPLE" checked.bind="selectedDiff" />
+                        <label for="sizeSmall">Simple</label>
+                        <input type="radio" name="radDiff" id="sizeMed" model.bind="gameLevel.MEDIUM" checked.bind="selectedDiff" />
+                        <label for="sizeMed">Medium</label>
+                        <input type="radio" name="radDiff" id="sizeLarge" model.bind="gameLevel.COMPLEX" checked.bind="selectedDiff" />
+                        <label for="sizeLarge">Complex</label>
                     </p>
                 </fieldset>
 
@@ -82,10 +86,9 @@
                 <summary>Information</summary>
                 <fieldset>
                     <legend>Difficulty</legend>
-                    RNG chance for a cell to have the puzzle cell value visible.
+                    Selects a preset difficulty setting for the result.
                     <ul>
-                        <li>Decrease the value to make the puzzle more difficult</li>
-                        <li>Increase the value to make it easier.</li>
+                        <li>Simple is easier, Complex more difficult</li>
                     </ul>
                 </fieldset>
 
@@ -102,7 +105,7 @@
                     </ul>
                 </fieldset>
             </details>
-            <h4>Note: if browser data cleared puzzle save is lost.</h4>
+            <h4>Note: If browser data is cleared; the puzzle save is lost.</h4>
         </details>
 
     </div>

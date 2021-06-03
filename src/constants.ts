@@ -18,7 +18,12 @@ export enum boardSize
     medium = .8,
     small = .6
 }
-
+export enum GameLevel
+{
+    SIMPLE,
+    MEDIUM,
+    COMPLEX
+}
 //initial board size width and height, if changed also update in sudou.scss
 export const initialHeight: number = 604;
 export const initialWidth: number = 604;
