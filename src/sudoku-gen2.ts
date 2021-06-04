@@ -1,4 +1,5 @@
 import * as C from "./constants";
+import {SudokuUtils} from "./sudoku-utils";
 
 // maxSize is the size of the 2D matrix maxSize*maxSize
 const maxSize = 9;
@@ -12,99 +13,6 @@ export class SudokuGen2
     _numberSet: number[][] = new Array(maxSize).fill(0).map(() => new Array(maxSize).fill(0));;
     _problemSet: number[][] = new Array(maxSize).fill(0).map(() => new Array(maxSize).fill(0));;
 
-    randomIntFromInterval(min, max)
-    { // min and max included 
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
-    range(start, stop, step = 1): number[] 
-    {
-        return [ ...Array(stop - start).keys() ]
-            .filter(i => !(i % Math.round(step)))
-            .map(v => start + v)
-    }
-
-    *rangeLazy(start, end, step = 1)
-    {
-        if (end === undefined) 
-        {
-            [ end, start ] = [ start, 0 ];
-        }
-
-        for (let n = start; n < end; n += step) 
-        {
-            yield n;
-        }
-    }
-    
-    shuffle(array)
-    {
-        for (var i = array.length - 1; i > 0; i--)
-        {
-            var rand = Math.floor(Math.random() * (i + 1));
-            [ array[ i ], array[ rand ] ] = [ array[ rand ], array[ i ] ]
-        }
-    }
-
-    getOffsets(block, i)
-    {
-        let colOffset = Math.floor(block / C.cellColSize) * C.cellsInBlock + i % C.cellColSize;
-        let rowOffset = C.blockSize * Math.floor(i / C.cellRowSize) + C.cellRowSize * (block % C.cellRowSize);
-        return { col: colOffset, row: rowOffset };
-    }
-    
-    // given a row and a sudoku, returns true if it's a legal row
-    isCorrectRow(row, sudoku)
-    {
-        let rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        let rowTemp = new Array();
-        for (let i = 0; i <= C.blockLoopMax; i++)
-        {
-            rowTemp[ i ] = sudoku[ row * C.blockSize + i ];
-        }
-        rowTemp.sort();
-        return rowTemp.join() == rightSequence.join();
-    }
-
-    // given a column and a sudoku, returns true if it's a legal column
-    isCorrectCol(col, sudoku)
-    {
-        let rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        let colTemp = new Array();
-        for (let i = 0; i <= C.blockLoopMax; i++)
-        {
-            colTemp[ i ] = sudoku[ col + i * C.blockSize ];
-        }
-        colTemp.sort();
-        return colTemp.join() == rightSequence.join();
-    }
-
-    // given a 3x3 block and a sudoku, returns true if it's a legal block 
-    isCorrectBlock(block, sudoku)
-    {
-        let rightSequence = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-        let blockTemp = new Array();
-        for (let i = 0; i <= C.blockLoopMax; i++)
-        {
-            let offset = this.getOffsets(block, i);
-            blockTemp[ i ] = sudoku[ offset.col + offset.row ];
-        }
-        blockTemp.sort();
-        return blockTemp.join() == rightSequence.join();
-    }
-
-    // given a sudoku, returns true if the sudoku is solved
-    isSolvedSudoku(sudoku)
-    {
-        for (let i = 0; i <= C.blockLoopMax; i++)
-        {
-            if (!this.isCorrectBlock(i, sudoku) || !this.isCorrectRow(i, sudoku) || !this.isCorrectCol(i, sudoku))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 
     fillSudoko(grid: number[][], row: number, col: number)
     {
@@ -122,7 +30,7 @@ export class SudokuGen2
         if (grid[ row ][ col ] != 0)
             return this.solveSudoko(grid, row, col + 1);
 
-        this.shuffle(validCellValues);
+        SudokuUtils.shuffle(validCellValues);
         for (let value of validCellValues)
         {
             if (this.isSafe(grid, row, col, value))                        
@@ -234,7 +142,7 @@ export class SudokuGen2
         do
         {
 
-            let i = this.randomIntFromInterval(0, 8);
+            let i = SudokuUtils.randomIntFromInterval(0, 8);
 
             if (maskedSet[ i ] == 0)
             {
@@ -242,11 +150,11 @@ export class SudokuGen2
                 setCount++;
                 // Mask each set
 
-                let maskPos = this.randomIntFromInterval(minPos, maxPos);
+                let maskPos = SudokuUtils.randomIntFromInterval(minPos, maxPos);
                 let j = 0;
                 do
                 {
-                    let newPos = this.randomIntFromInterval(0, 8);
+                    let newPos = SudokuUtils.randomIntFromInterval(0, 8);
                     let x = this._setRowPosition[ i ] + posX[ newPos ];
                     let y = this._setColPosition[ i ] + posY[ newPos ];
                     if (this._problemSet[ x ][ y ] == 0)

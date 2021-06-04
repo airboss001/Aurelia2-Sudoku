@@ -7,6 +7,7 @@ import { bindable } from 'aurelia';
 import { Validate } from './validate';
 import { CellModel } from './cell-model';
 import { SudokuGen2 } from './sudoku-gen2';
+import { SudokuUtils } from './sudoku-utils';
 import * as alerty from "alerty/dist/js/alerty.js";
 import { sudokuLoopSize, boardSize, GameLevel, initialWidth, positionTopLeft } from './constants';
 import { Action } from './action';
@@ -203,7 +204,7 @@ export class Sudoku
             return e.value !== "" ? +e.value : +e.startValue;
         });
 
-        if (this.sudokuGen2.isSolvedSudoku(checkSolved))
+        if (SudokuUtils.isSolvedSudoku(checkSolved))
         {
             alerty.alert(
                 "<h1>Congratulations!</h1>", 

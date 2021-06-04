@@ -1,10 +1,13 @@
 import { CellModel } from "./cell-model";
 import { Position } from './position';
 import { blockSize, sudokuLoopSize, sudokuSize } from "./constants";
-import { SudokuUtils } from "./sudoku-utils";
-
 export class MoveCellSelection
 {
+    returnRow(cell: number): number
+    {
+        return Math.floor(cell / blockSize);
+    }
+
     moveCellSelection(sudoku: CellModel[], key:string, position: Position): void
     {
         position.prevPos = position.currPos;
@@ -55,7 +58,7 @@ export class MoveCellSelection
     moveRight(sudoku: CellModel[], position: Position)
     {
         let pos = position.currPos;
-        let row = SudokuUtils.returnRow(pos);
+        let row = this.returnRow(pos);
         let rowCol = pos % blockSize;
         rowCol = (rowCol + 1) % blockSize;
         position.currPos = row * blockSize + rowCol;
@@ -65,7 +68,7 @@ export class MoveCellSelection
     moveLeft(sudoku: CellModel[], position: Position)
     {
         let pos = position.currPos;
-        let row = SudokuUtils.returnRow(pos);
+        let row = this.returnRow(pos);
         let rowCol = pos % blockSize;
         if (rowCol === 0)
         {
